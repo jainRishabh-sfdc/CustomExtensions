@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+<deploymentStatus>Deployed</deploymentStatus>
+<description>Permanent, append-only history of every step on an alert. Updates and deletes are blocked by trigger.</description>
+<enableActivities>false</enableActivities>
+<enableHistory>true</enableHistory>
+<enableReports>true</enableReports>
+<enableSearch>true</enableSearch>
+<label>RPM Alert Event</label>
+<nameField><displayFormat>AE-{0000000}</displayFormat><label>RPM Alert Event Number</label><startingNumber>1</startingNumber><type>AutoNumber</type></nameField>
+<pluralLabel>RPM Alert Events</pluralLabel>
+<sharingModel>ControlledByParent</sharingModel><externalSharingModel>ControlledByParent</externalSharingModel>
+</CustomObject>

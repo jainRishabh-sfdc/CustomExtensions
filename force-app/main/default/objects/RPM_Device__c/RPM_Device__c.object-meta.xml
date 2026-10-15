@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+<deploymentStatus>Deployed</deploymentStatus>
+<description>A connected monitoring device (cuff, scale) identified by IMEI.</description>
+<enableActivities>false</enableActivities>
+<enableHistory>true</enableHistory>
+<enableReports>true</enableReports>
+<enableSearch>true</enableSearch>
+<label>RPM Device</label>
+<nameField><label>RPM Device Name</label><type>Text</type></nameField>
+<pluralLabel>RPM Devices</pluralLabel>
+<sharingModel>ReadWrite</sharingModel><externalSharingModel>Private</externalSharingModel>
+</CustomObject>

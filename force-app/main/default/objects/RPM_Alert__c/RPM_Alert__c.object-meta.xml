@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+<deploymentStatus>Deployed</deploymentStatus>
+<description>An unusual reading or device problem that must walk the six-step workflow.</description>
+<enableActivities>false</enableActivities>
+<enableHistory>true</enableHistory>
+<enableReports>true</enableReports>
+<enableSearch>true</enableSearch>
+<label>RPM Alert</label>
+<nameField><displayFormat>AL-{000000}</displayFormat><label>RPM Alert Number</label><startingNumber>1</startingNumber><type>AutoNumber</type></nameField>
+<pluralLabel>RPM Alerts</pluralLabel>
+<sharingModel>Private</sharingModel><externalSharingModel>Private</externalSharingModel>
+</CustomObject>

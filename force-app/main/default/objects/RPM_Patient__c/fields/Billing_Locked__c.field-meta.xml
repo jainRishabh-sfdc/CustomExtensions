@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName>Billing_Locked__c</fullName><label>RPM Billing Locked</label><description>Double-billing guard. When checked no RPM codes are produced (e.g. patient is paid through a CMS model like ACCESS).</description><defaultValue>false</defaultValue><type>Checkbox</type></CustomField>

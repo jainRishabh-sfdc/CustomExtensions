@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+<description>Alert protocol thresholds. Subscribers edit these per clinic. Only one record should be Active.</description>
+<label>RPM Protocol</label>
+<pluralLabel>RPM Protocols</pluralLabel>
+<visibility>Public</visibility>
+</CustomObject>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+<deploymentStatus>Deployed</deploymentStatus>
+<description>Care management time logged by staff. Feeds the billing engine.</description>
+<enableActivities>false</enableActivities>
+<enableHistory>true</enableHistory>
+<enableReports>true</enableReports>
+<enableSearch>true</enableSearch>
+<label>RPM Time Entry</label>
+<nameField><displayFormat>TE-{0000000}</displayFormat><label>RPM Time Entry Number</label><startingNumber>1</startingNumber><type>AutoNumber</type></nameField>
+<pluralLabel>RPM Time Entries</pluralLabel>
+<sharingModel>ReadWrite</sharingModel><externalSharingModel>Private</externalSharingModel>
+</CustomObject>

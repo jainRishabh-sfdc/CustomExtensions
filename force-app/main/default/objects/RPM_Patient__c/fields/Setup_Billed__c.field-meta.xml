@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName>Setup_Billed__c</fullName><label>Setup Code Billed</label><description>True once the one-time device setup code has been billed for this episode.</description><defaultValue>false</defaultValue><type>Checkbox</type></CustomField>

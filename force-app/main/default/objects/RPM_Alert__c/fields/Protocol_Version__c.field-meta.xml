@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName>Protocol_Version__c</fullName><label>Protocol Version</label><description>Version of the alert protocol that raised this alert. Kept for audit.</description><length>40</length><type>Text</type><required>false</required></CustomField>

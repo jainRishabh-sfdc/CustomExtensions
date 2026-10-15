@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName>Source_Event_Id__c</fullName><label>Source Event Id</label><description>Vendor event id. Used to drop duplicate webhook deliveries.</description><length>120</length><type>Text</type><externalId>true</externalId><unique>true</unique><caseSensitive>false</caseSensitive><required>false</required></CustomField>

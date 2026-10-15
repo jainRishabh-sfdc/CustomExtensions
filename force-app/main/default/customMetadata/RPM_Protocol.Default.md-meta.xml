@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<label>Default</label>
+<protected>false</protected>
+<values><field>Version__c</field><value xsi:type="xsd:string">1.0-default</value></values>
+<values><field>Active__c</field><value xsi:type="xsd:boolean">true</value></values>
+<values><field>Alert_Systolic__c</field><value xsi:type="xsd:double">150</value></values>
+<values><field>Critical_Systolic__c</field><value xsi:type="xsd:double">180</value></values>
+<values><field>Low_Systolic__c</field><value xsi:type="xsd:double">90</value></values>
+<values><field>Critical_SLA_Minutes__c</field><value xsi:type="xsd:double">60</value></values>
+<values><field>Urgent_SLA_Hours__c</field><value xsi:type="xsd:double">4</value></values>
+<values><field>Routine_SLA_Hours__c</field><value xsi:type="xsd:double">72</value></values>
+<values><field>Trend_Window_Days__c</field><value xsi:type="xsd:double">14</value></values>
+<values><field>Trend_Rise_Systolic__c</field><value xsi:type="xsd:double">6</value></values>
+<values><field>Silent_Days__c</field><value xsi:type="xsd:double">7</value></values>
+<values><field>Low_Battery_Percent__c</field><value xsi:type="xsd:double">25</value></values>
+</CustomMetadata>

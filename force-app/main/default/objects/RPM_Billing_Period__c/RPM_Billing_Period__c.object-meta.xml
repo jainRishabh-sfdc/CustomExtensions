@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+<deploymentStatus>Deployed</deploymentStatus>
+<description>Billing summary for one patient over one period. Recalculated by the billing engine.</description>
+<enableActivities>false</enableActivities>
+<enableHistory>true</enableHistory>
+<enableReports>true</enableReports>
+<enableSearch>true</enableSearch>
+<label>RPM Billing Period</label>
+<nameField><displayFormat>BP-{000000}</displayFormat><label>RPM Billing Period Number</label><startingNumber>1</startingNumber><type>AutoNumber</type></nameField>
+<pluralLabel>RPM Billing Periods</pluralLabel>
+<sharingModel>ReadWrite</sharingModel><externalSharingModel>Private</externalSharingModel>
+</CustomObject>
