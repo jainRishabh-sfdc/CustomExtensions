@@ -4,6 +4,9 @@
     display: block;
     position: relative;
 }
-.rpm-kpi {
+.rpm-stat {
     cursor: default;
+}
+.rpm-auditrow td {
+    background: var(--rpm-surface-2);
 }

@@ -1,56 +1,41 @@
 <template>
-    <p class="rpm-intro">Start here each morning. Every number is a button that opens the work behind it. Most urgent first.</p>
+    <p class="rpm-lede">Work this list from the top. Critical readings come first, then whatever is closest to its response time.</p>
     <template lwc:if={error}>
-        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">{error}</div>
+        <div class="rpm-alertbox rpm-error" role="alert">{error}</div>
     </template>
     <template lwc:if={loading}>
         <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
     </template>
     <template lwc:if={data}>
-        <div class="rpm-kpis">
-            <template for:each={kpis} for:item="k">
-                <button key={k.key} class={k.cls} data-tab={k.tab} data-filter={k.filter} data-risk={k.risk} onclick={handleKpi}>
-                    <div class="rpm-kpi__v">{k.value}</div>
-                    <div class="rpm-kpi__l">{k.label}</div>
+        <div class="rpm-stats">
+            <template for:each={stats} for:item="s">
+                <button key={s.key} class={s.cls} data-tab={s.tab} data-filter={s.filter} data-risk={s.risk} onclick={handleStat}>
+                    <div class="rpm-stat__v">{s.value}</div>
+                    <div class="rpm-stat__l">{s.label}</div>
                 </button>
             </template>
         </div>
 
-        <div class="rpm-panel">
-            <div class="rpm-panel__head">Today's to-do list</div>
-            <div class="rpm-panel__sub">Open alerts, critical first, then by how soon they are due.</div>
-            <div class="rpm-panel__body">
-                <template lwc:if={hasTodo}>
-                    <template for:each={todo} for:item="t">
-                        <div key={t.id} class="rpm-todo">
-                            <span class={t.chipClass}>{t.chipLabel}</span>
-                            <div class="rpm-todo__main">
-                                <div class="rpm-todo__title">{t.summary}</div>
-                                <div class="rpm-muted">
-                                    <button class="rpm-link" data-id={t.patientId} onclick={openPatient}>{t.patientName}</button>
-                                    · step {t.step} · {t.ownerText} · {t.dueText}
-                                </div>
+        <div class="rpm-card">
+            <div class="rpm-card__h"><h2>Queue</h2><span class="rpm-muted">{openCount} open</span></div>
+            <div class="rpm-card__sub">Each row opens the alert it belongs to.</div>
+            <div class="rpm-card__b rpm-card__b_flush">
+                <template for:each={queue} for:item="q">
+                    <div key={q.id} class="rpm-queue">
+                        <span class={q.whenClass}>{q.whenLabel}</span>
+                        <div>
+                            <div class="rpm-queue__what">{q.summary}</div>
+                            <div class="rpm-queue__meta">
+                                <button class="rpm-link" data-id={q.patientId} onclick={openPatient}>{q.patientName}</button>
+                                <span class="rpm-sep">—</span>{q.metaText}
                             </div>
-                            <lightning-button
-                                label="Open alert"
-                                variant={t.buttonVariant}
-                                data-filter={t.filter}
-                                onclick={openAlert}
-                            ></lightning-button>
                         </div>
-                    </template>
+                        <button class={q.buttonClass} data-filter={q.filter} onclick={openAlert}>Open alert</button>
+                    </div>
                 </template>
-                <template lwc:else>
-                    <div class="rpm-empty">Nothing open — all clear.</div>
+                <template lwc:if={queueEmpty}>
+                    <div class="rpm-empty">Queue is clear. New readings will appear here as they arrive.</div>
                 </template>
-            </div>
-        </div>
-
-        <div class="rpm-panel">
-            <div class="rpm-panel__head">How this console works</div>
-            <div class="rpm-panel__body rpm-muted">
-                Green / Yellow / Red next to a patient shows how much attention they need. Alerts walk six steps so
-                nothing gets dropped. Billing shows which RPM codes each patient has earned this month.
             </div>
         </div>
     </template>

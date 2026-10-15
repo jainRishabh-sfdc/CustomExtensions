@@ -1,39 +1,51 @@
 <template>
     <lightning-modal-header label={heading}></lightning-modal-header>
     <lightning-modal-body>
-        <p class="rpm-sub">{patientName} · {summary}</p>
-        <p class="rpm-sub">{instruction}</p>
-        <lightning-combobox
-            label="1 · Did you reach the patient?"
-            options={outcomeOptions}
-            value={outcome}
-            onchange={handleOutcome}
-            required
-        ></lightning-combobox>
-        <lightning-combobox
-            label="2 · Any symptoms? (chest pain, trouble breathing, weakness, confusion)"
-            options={symptomOptions}
-            value={symptoms}
-            onchange={handleSymptoms}
-            required={critical}
-        ></lightning-combobox>
-        <lightning-combobox
-            label="3 · Was the provider notified?"
-            options={providerOptions}
-            value={provider}
-            onchange={handleProvider}
-            required={critical}
-        ></lightning-combobox>
-        <lightning-input label="Recheck reading or note (optional)" max-length="200" value={note} onchange={handleNote}></lightning-input>
-        <template lwc:if={showEr}>
-            <div class="rpm-warn">Symptoms present: advise 911 / ER now and notify the provider the same hour.</div>
-        </template>
-        <template lwc:if={error}>
-            <div class="rpm-err">{error}</div>
-        </template>
+        <div class="rpm-m">
+            <p class="rpm-m__sub">{patientName}: {summary}. {instruction}</p>
+            <label class="rpm-m__field">
+                Did you reach the patient?
+                <select onchange={handleOutcome}>
+                    <option value="">Choose</option>
+                    <template for:each={outcomeOptions} for:item="o">
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                    </template>
+                </select>
+            </label>
+            <label class="rpm-m__field">
+                Any chest pain, trouble breathing, weakness or confusion?
+                <select onchange={handleSymptoms}>
+                    <option value="">Choose</option>
+                    <template for:each={symptomOptions} for:item="o">
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                    </template>
+                </select>
+            </label>
+            <label class="rpm-m__field">
+                Was the provider told?
+                <select onchange={handleProvider}>
+                    <option value="">Choose</option>
+                    <template for:each={providerOptions} for:item="o">
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                    </template>
+                </select>
+            </label>
+            <label class="rpm-m__field">
+                Recheck reading or note
+                <input type="text" maxlength="200" placeholder="For example 168/98 after 10 minutes rest" onchange={handleNote} />
+            </label>
+            <template lwc:if={showEr}>
+                <div class="rpm-m__err">Symptoms present: advise 911 or the ER now, and tell the provider within the hour.</div>
+            </template>
+            <template lwc:if={error}>
+                <div class="rpm-m__err">{error}</div>
+            </template>
+        </div>
     </lightning-modal-body>
     <lightning-modal-footer>
-        <lightning-button label="Cancel" onclick={cancel}></lightning-button>
-        <lightning-button class="rpm-save" variant={saveVariant} label="Save call record" onclick={save}></lightning-button>
+        <div class="rpm-m__foot">
+            <button class="rpm-m__btn" onclick={cancel}>Cancel</button>
+            <button class={saveClass} onclick={save}>Save call</button>
+        </div>
     </lightning-modal-footer>
 </template>

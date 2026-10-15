@@ -91,32 +91,112 @@ export function daysAgo(value) {
 
 export function riskClass(risk) {
     if (risk === 'RED') {
-        return 'rpm-chip rpm-chip_crit';
+        return 'rpm-tag rpm-tag_rose';
     }
     if (risk === 'YELLOW') {
-        return 'rpm-chip rpm-chip_warn';
+        return 'rpm-tag rpm-tag_amber';
     }
-    return 'rpm-chip rpm-chip_ok';
+    return 'rpm-tag rpm-tag_emerald';
+}
+
+export function riskLabel(risk) {
+    if (risk === 'RED') {
+        return 'Red';
+    }
+    if (risk === 'YELLOW') {
+        return 'Yellow';
+    }
+    return 'Green';
 }
 
 export function severityClass(severity) {
     if (severity === 'Critical') {
-        return 'rpm-chip rpm-chip_crit';
+        return 'rpm-tag rpm-tag_rose';
     }
     if (severity === 'Urgent') {
-        return 'rpm-chip rpm-chip_hot';
+        return 'rpm-tag rpm-tag_amber';
     }
-    return 'rpm-chip rpm-chip_warn';
+    return 'rpm-tag rpm-tag_indigo';
 }
 
 export function severityLabel(severity) {
     if (severity === 'Critical') {
-        return 'CRITICAL';
+        return 'Critical';
     }
     if (severity === 'Urgent') {
-        return 'Needs follow-up';
+        return 'Urgent';
     }
-    return 'This week';
+    return 'Routine';
+}
+
+/** What each RPM code means, shown inside the CPT pill. */
+export const CPT_LABELS = {
+    99453: 'Setup',
+    99454: 'Device, 16+ days',
+    99445: 'Device, 2–15 days',
+    99457: 'First 20 min',
+    99458: 'Each extra 20 min',
+    99470: 'First 10 min'
+};
+
+/** "99454,99457,99458x2" -> [{ key, code, units, label }] */
+export function parseCodes(codes) {
+    if (!codes) {
+        return [];
+    }
+    return codes
+        .split(',')
+        .map((c) => c.trim())
+        .filter((c) => c)
+        .map((c) => {
+            const [code, units] = c.split('x');
+            return { key: c, code, units: units ? Number(units) : 1, text: units ? `${code} ×${units}` : code, label: CPT_LABELS[code] || '' };
+        });
+}
+
+/** Width and colour for a progress bar toward a goal. */
+export function meter(value, goal) {
+    const v = Number(value || 0);
+    const pct = Math.min(100, (v / goal) * 100);
+    return {
+        value: v,
+        goal,
+        style: `width:${pct}%`,
+        fillClass: pct >= 100 ? 'rpm-track__fill rpm-track__fill_full' : 'rpm-track__fill'
+    };
+}
+
+/** Plain-language explanation of how a billing row's codes were reached. */
+export function billingAudit(b) {
+    const days = Number(b.readingDays || 0);
+    const mins = Number(b.minutes || 0);
+    const codes = parseCodes(b.codes).map((c) => c.code);
+    const lines = [`${days} reading days counted this month`, `${mins} care minutes logged, ${b.interactive ? 'with' : 'without'} interactive communication`];
+    if (b.blockedReason) {
+        lines.push('Stopped: ' + b.blockedReason);
+        return lines;
+    }
+    if (codes.includes('99453')) {
+        lines.push('99453 earned: first month with 2 or more reading days');
+    }
+    if (codes.includes('99454')) {
+        lines.push('99454 earned: 16 or more reading days');
+    } else if (codes.includes('99445')) {
+        lines.push(`99445 earned: 2–15 reading days (${16 - days} more would reach 99454)`);
+    } else {
+        lines.push('Under 2 reading days: no device code yet');
+    }
+    if (!b.interactive) {
+        lines.push('No live call or video logged: management codes need interactive communication');
+    } else if (codes.includes('99457')) {
+        lines.push('99457 earned: 20 or more interactive minutes');
+        lines.push(codes.includes('99458') ? '99458 earned for each further 20 minutes' : `${40 - mins} more minutes would add 99458`);
+    } else if (codes.includes('99470')) {
+        lines.push(`99470 earned: 10–19 interactive minutes (${20 - mins} more would reach 99457)`);
+    } else {
+        lines.push('Under 10 interactive minutes: no management code yet');
+    }
+    return lines;
 }
 
 /** Fires the console-wide navigation event. */

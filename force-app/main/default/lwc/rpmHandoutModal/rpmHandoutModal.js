@@ -20,8 +20,12 @@ export default class RpmHandoutModal extends LightningModal {
     loaner = false;
     error;
 
-    get bars() {
-        return [1, 2, 3, 4].map((i) => ({ key: 'b' + i, cls: i <= this.step ? 'rpm-bar rpm-bar_done' : 'rpm-bar' }));
+    get steps() {
+        return ['Right cuff', 'Right patient', 'Trained', 'Live'].map((label, i) => ({
+            key: 's' + i,
+            label,
+            cls: i < this.step ? 'rpm-step4 rpm-step4_on' : 'rpm-step4'
+        }));
     }
 
     get isStep1() {
@@ -38,11 +42,11 @@ export default class RpmHandoutModal extends LightningModal {
     }
 
     get nextLabel() {
-        return this.step === 1 ? 'Numbers match the box' : 'Continue';
+        return this.step === 1 ? 'Label matches' : 'Continue';
     }
 
     get patientOptions() {
-        return (this.patients || []).map((p) => ({ label: p.name, value: p.id }));
+        return (this.patients || []).map((p) => ({ label: p.name, value: p.id, selected: p.id === this.patientId }));
     }
 
     get patientName() {
@@ -51,7 +55,7 @@ export default class RpmHandoutModal extends LightningModal {
     }
 
     handlePatient(e) {
-        this.patientId = e.detail.value;
+        this.patientId = e.target.value;
     }
     handleIdentity(e) {
         this.identity = e.target.checked;
@@ -69,11 +73,11 @@ export default class RpmHandoutModal extends LightningModal {
     next() {
         this.error = undefined;
         if (this.step === 2 && (!this.patientId || !this.identity)) {
-            this.error = 'Choose the patient and confirm both identifiers.';
+            this.error = 'Choose the patient and confirm name and date of birth.';
             return;
         }
         if (this.step === 3 && !(this.training && this.testReading && this.loaner)) {
-            this.error = 'All three checks are required before a device goes live.';
+            this.error = 'All three checks are needed before the cuff goes live.';
             return;
         }
         this.step += 1;

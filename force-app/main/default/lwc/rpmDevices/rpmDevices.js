@@ -41,14 +41,23 @@ export default class RpmDevices extends LightningElement {
         return (this.data.field || [])
             .map((d) => {
                 const attention = d.silent || d.lowBattery;
+                const bat = d.battery === null || d.battery === undefined ? null : Number(d.battery);
+                let status = ['rpm-tag rpm-tag_emerald', 'Sending'];
+                if (d.silent) {
+                    status = ['rpm-tag rpm-tag_rose', d.daysSilent === null || d.daysSilent === undefined ? 'Never sent' : `Silent ${d.daysSilent} days`];
+                } else if (d.lowBattery) {
+                    status = ['rpm-tag rpm-tag_amber', 'Battery low'];
+                }
                 return {
                     ...d,
                     label: this.label(d),
                     attention,
                     lastText: d.lastReading ? formatDateTime(d.lastReading) : 'never',
-                    batteryText: d.battery === null || d.battery === undefined ? '—' : d.battery + '%',
-                    statusText: d.silent ? (d.daysSilent === null || d.daysSilent === undefined ? 'Never sent' : `Silent ${d.daysSilent} days`) : d.lowBattery ? 'Battery low' : 'Working',
-                    statusClass: d.silent ? 'rpm-chip rpm-chip_crit' : d.lowBattery ? 'rpm-chip rpm-chip_warn' : 'rpm-chip rpm-chip_ok'
+                    batteryText: bat === null ? '—' : bat + '%',
+                    batteryStyle: `width:${bat === null ? 0 : Math.min(100, bat)}%`,
+                    batteryFill: d.lowBattery ? 'rpm-track__fill rpm-track__fill_low' : 'rpm-track__fill rpm-track__fill_full',
+                    statusClass: status[0],
+                    statusText: status[1]
                 };
             })
             .sort((a, b) => Number(b.attention) - Number(a.attention));
@@ -113,7 +122,8 @@ export default class RpmDevices extends LightningElement {
                 testReading: result.testReading,
                 loanerAck: result.loaner
             });
-            this.toast(`${this.label(device)} is live — readings now land in the patient's chart`, 'success');
+            this.toast(`${this.label(device)} is live. Readings now land in the patient's chart.`, 'success');
+            this.dispatchEvent(new CustomEvent('rpmrefresh', { bubbles: true, composed: true }));
             await this.load();
         } catch (e) {
             this.toast(reduceError(e), 'error');
@@ -124,15 +134,16 @@ export default class RpmDevices extends LightningElement {
         const { id, label } = event.currentTarget.dataset;
         const reason = await LightningPrompt.open({
             message: `What is wrong with ${label}?`,
-            label: 'Return device',
-            defaultValue: 'Not working'
+            label: 'Return cuff',
+            defaultValue: 'Not sending readings'
         });
         if (reason === null || reason === undefined) {
             return;
         }
         try {
             await returnDeviceApex({ deviceId: id, reason });
-            this.toast(`${label} marked for return — hand out a replacement from stock`, 'success');
+            this.toast(`${label} marked for return. Hand out a replacement from the shelf.`, 'success');
+            this.dispatchEvent(new CustomEvent('rpmrefresh', { bubbles: true, composed: true }));
             await this.load();
         } catch (e) {
             this.toast(reduceError(e), 'error');

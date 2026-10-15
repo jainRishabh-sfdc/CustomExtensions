@@ -27,17 +27,17 @@ export default class RpmCallModal extends LightningModal {
     }
 
     get heading() {
-        return this.critical ? 'Critical alert — record the patient call' : 'Record the patient call';
+        return this.critical ? 'Record the call for this critical reading' : 'Record the call';
     }
 
     get instruction() {
         return this.critical
-            ? 'Required before this alert can move forward. It becomes part of the permanent history.'
-            : 'Record whether you reached the patient. Symptoms and provider are optional for this alert.';
+            ? 'All three answers are required and become part of the permanent history.'
+            : 'Only the first answer is required for this alert.';
     }
 
-    get saveVariant() {
-        return this.critical ? 'destructive' : 'brand';
+    get saveClass() {
+        return this.critical ? 'rpm-m__btn rpm-m__btn_danger' : 'rpm-m__btn rpm-m__btn_primary';
     }
 
     get showEr() {
@@ -45,13 +45,13 @@ export default class RpmCallModal extends LightningModal {
     }
 
     handleOutcome(e) {
-        this.outcome = e.detail.value;
+        this.outcome = e.target.value;
     }
     handleSymptoms(e) {
-        this.symptoms = e.detail.value;
+        this.symptoms = e.target.value;
     }
     handleProvider(e) {
-        this.provider = e.detail.value;
+        this.provider = e.target.value;
     }
     handleNote(e) {
         this.note = e.target.value;
@@ -63,7 +63,7 @@ export default class RpmCallModal extends LightningModal {
 
     save() {
         if (!this.outcome || (this.critical && (!this.symptoms || !this.provider))) {
-            this.error = this.critical ? 'Please answer all three questions before saving.' : 'Please record whether you reached the patient.';
+            this.error = this.critical ? 'Answer all three questions to save this call.' : 'Say whether you reached the patient to save this call.';
             return;
         }
         this.close({ outcome: this.outcome, symptoms: this.symptoms, provider: this.provider, note: this.note });

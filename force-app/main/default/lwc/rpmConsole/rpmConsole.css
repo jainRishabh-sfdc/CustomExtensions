@@ -1,53 +1,302 @@
 :host {
     display: block;
-    font-family: 'IBM Plex Sans', 'Salesforce Sans', Arial, sans-serif;
-    color: #16211f;
 }
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* ---------- colour tokens: Day ---------- */
 .rpm-shell {
-    background: #f5f7f4;
-    min-height: 100%;
-    border-radius: 0.5rem;
+    --rpm-canvas: #f4f6f9;
+    --rpm-dot: rgba(15, 23, 42, 0.04);
+    --rpm-surface: #ffffff;
+    --rpm-surface-2: #f1f4f8;
+    --rpm-surface-3: #e8ecf1;
+    --rpm-ink: #0f172a;
+    --rpm-ink-2: #334155;
+    --rpm-ink-3: #64748b;
+    --rpm-ink-4: #94a3b8;
+    --rpm-line: #e2e8f0;
+    --rpm-line-2: #cbd5e1;
+    --rpm-indigo: #4f46e5;
+    --rpm-indigo-hover: #4338ca;
+    --rpm-indigo-soft: #eef2ff;
+    --rpm-indigo-ink: #3730a3;
+    --rpm-indigo-line: #c7d2fe;
+    --rpm-rose: #e11d48;
+    --rpm-rose-soft: #fff1f2;
+    --rpm-rose-ink: #9f1239;
+    --rpm-rose-line: #fecdd3;
+    --rpm-amber: #d97706;
+    --rpm-amber-soft: #fffbeb;
+    --rpm-amber-ink: #92400e;
+    --rpm-amber-line: #fde68a;
+    --rpm-emerald: #059669;
+    --rpm-emerald-soft: #ecfdf5;
+    --rpm-emerald-ink: #065f46;
+    --rpm-emerald-line: #a7f3d0;
+    --rpm-cyan: #06b6d4;
+    --rpm-slate-soft: #f1f5f9;
+    --rpm-slate-ink: #475569;
+    --rpm-band: rgba(79, 70, 229, 0.07);
+    --rpm-grid: #e8ecf1;
+    --rpm-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px -6px rgba(15, 23, 42, 0.08);
+    --rpm-head: #0f172a;
+    --rpm-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --rpm-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+    font-family: var(--rpm-sans);
+    color: var(--rpm-ink);
+    background-color: var(--rpm-canvas);
+    background-image: radial-gradient(var(--rpm-dot) 1px, transparent 1px);
+    background-size: 20px 20px;
+    border-radius: 16px;
     overflow: hidden;
+    border: 1px solid var(--rpm-line);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100%;
 }
-.rpm-header {
-    background: #134e4a;
-    color: #eaf3f1;
-    padding: 0.9rem 1.25rem 0.4rem;
+
+/* ---------- colour tokens: Night shift ---------- */
+.rpm-shell_night {
+    --rpm-canvas: #0b1120;
+    --rpm-dot: rgba(248, 250, 252, 0.035);
+    --rpm-surface: #111827;
+    --rpm-surface-2: #1a2332;
+    --rpm-surface-3: #243044;
+    --rpm-ink: #f1f5f9;
+    --rpm-ink-2: #cbd5e1;
+    --rpm-ink-3: #94a3b8;
+    --rpm-ink-4: #64748b;
+    --rpm-line: #1e293b;
+    --rpm-line-2: #334155;
+    --rpm-indigo: #818cf8;
+    --rpm-indigo-hover: #a5b4fc;
+    --rpm-indigo-soft: rgba(99, 102, 241, 0.14);
+    --rpm-indigo-ink: #c7d2fe;
+    --rpm-indigo-line: rgba(129, 140, 248, 0.28);
+    --rpm-rose: #fb7185;
+    --rpm-rose-soft: rgba(225, 29, 72, 0.14);
+    --rpm-rose-ink: #fda4af;
+    --rpm-rose-line: rgba(251, 113, 133, 0.28);
+    --rpm-amber: #fbbf24;
+    --rpm-amber-soft: rgba(217, 119, 6, 0.14);
+    --rpm-amber-ink: #fde68a;
+    --rpm-amber-line: rgba(251, 191, 36, 0.28);
+    --rpm-emerald: #34d399;
+    --rpm-emerald-soft: rgba(5, 150, 105, 0.14);
+    --rpm-emerald-ink: #a7f3d0;
+    --rpm-emerald-line: rgba(52, 211, 153, 0.28);
+    --rpm-cyan: #22d3ee;
+    --rpm-slate-soft: #1e293b;
+    --rpm-slate-ink: #cbd5e1;
+    --rpm-band: rgba(129, 140, 248, 0.12);
+    --rpm-grid: #1e293b;
+    --rpm-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px -8px rgba(0, 0, 0, 0.45);
+    --rpm-head: #060a12;
 }
-.rpm-brand {
-    font-weight: 700;
-    font-size: 1.1rem;
+
+/* ---------- header ---------- */
+.rpm-head {
+    background: var(--rpm-head);
+    color: #f1f5f9;
+    padding: 20px 24px 0;
 }
-.rpm-brand__sub {
-    display: block;
-    font-weight: 400;
-    font-size: 0.72rem;
-    opacity: 0.8;
-}
-.rpm-nav {
+.rpm-head__row {
     display: flex;
-    gap: 0.2rem;
-    background: #134e4a;
-    padding: 0.5rem 0.9rem 0;
-    overflow-x: auto;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
 }
-.rpm-tab {
+.rpm-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #6366f1, #4f46e5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+}
+.rpm-mark svg {
+    width: 22px;
+    height: 22px;
+    stroke: #fff;
+}
+.rpm-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+.rpm-title small {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #94a3b8;
+    letter-spacing: 0;
+    margin-top: 3px;
+}
+.rpm-pill-dark {
+    font-family: var(--rpm-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 6px;
+    border: 1px solid rgba(165, 180, 252, 0.35);
+    color: #c7d2fe;
+    margin-left: 8px;
+    vertical-align: 3px;
+}
+.rpm-head__right {
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* stopwatch */
+.rpm-timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 7px 8px 7px 14px;
+}
+.rpm-timer__l {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    display: block;
+}
+.rpm-timer__v {
+    font-family: var(--rpm-mono);
+    font-size: 1.12rem;
     font-weight: 600;
-    font-size: 0.88rem;
-    color: #bfd6d2;
-    padding: 0.65rem 1rem 0.75rem;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+.rpm-timer__v_run {
+    color: #a5b4fc;
+}
+.rpm-timer__btn {
+    border-radius: 8px;
+    padding: 6px 12px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.76rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
     border: none;
-    background: none;
-    border-radius: 0.6rem 0.6rem 0 0;
     cursor: pointer;
+}
+.rpm-timer__btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+.rpm-timer__btn_primary {
+    background: #4f46e5;
+    color: #fff;
+}
+.rpm-timer__btn_primary:hover {
+    background: #4338ca;
+}
+
+/* day / night */
+.rpm-theme {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 3px;
+}
+.rpm-theme button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.rpm-theme button:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+}
+.rpm-theme button.rpm-theme__on {
+    background: #4f46e5;
+    color: #fff;
+}
+
+/* tabs */
+.rpm-tabs {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.rpm-tabs__tab {
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #94a3b8;
+    padding: 11px 18px 13px;
+    border-radius: 12px 12px 0 0;
     white-space: nowrap;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
-.rpm-tab_on {
-    background: #f5f7f4;
-    color: #134e4a;
+.rpm-tabs__tab:hover {
+    color: #e2e8f0;
 }
+.rpm-tabs__tab_on,
+.rpm-tabs__tab_on:hover {
+    background: var(--rpm-canvas);
+    color: var(--rpm-ink);
+    box-shadow: inset 0 3px 0 var(--rpm-indigo);
+}
+.rpm-tabs__n {
+    font-family: var(--rpm-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    min-width: 20px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+}
+.rpm-tabs__tab_on .rpm-tabs__n {
+    background: var(--rpm-rose-soft);
+    color: var(--rpm-rose-ink);
+}
+.rpm-tabs__tab:focus-visible,
+.rpm-theme button:focus-visible,
+.rpm-timer__btn:focus-visible {
+    outline: 2px solid #a5b4fc;
+    outline-offset: 2px;
+}
+
 .rpm-main {
-    padding: 1rem;
-    max-width: 1200px;
+    padding: 20px 24px 28px;
+    max-width: 1320px;
     margin: 0 auto;
+}
+
+@media (max-width: 760px) {
+    .rpm-head__right {
+        margin-left: 0;
+    }
+    .rpm-main {
+        padding: 16px;
+    }
 }

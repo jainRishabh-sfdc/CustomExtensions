@@ -1,0 +1,95 @@
+/* Modals open outside the console, so they carry their own (Day) colours. */
+/* Shared modal look. Import with: @import 'c/rpmModalStyles'; */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+.rpm-m {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: #0f172a;
+}
+.rpm-m__sub {
+    font-size: 0.84rem;
+    color: #64748b;
+    line-height: 1.55;
+    margin-bottom: 14px;
+}
+.rpm-m__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 14px;
+}
+.rpm-m__field select,
+.rpm-m__field input {
+    height: 38px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0 12px;
+    background: #fff;
+    color: #0f172a;
+    font: inherit;
+    font-weight: 500;
+    font-size: 0.86rem;
+}
+.rpm-m__field select:focus,
+.rpm-m__field input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px #eef2ff;
+    outline: none;
+}
+.rpm-m__err {
+    color: #9f1239;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-top: 8px;
+}
+.rpm-m__foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+.rpm-m__btn {
+    height: 36px;
+    padding: 0 15px;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.82rem;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #0f172a;
+    cursor: pointer;
+}
+.rpm-m__btn:hover {
+    background: #f1f4f8;
+}
+.rpm-m__btn_primary {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #fff;
+}
+.rpm-m__btn_primary:hover {
+    background: #4338ca;
+}
+.rpm-m__btn_danger {
+    background: #e11d48;
+    border-color: #e11d48;
+    color: #fff;
+}
+.rpm-m__btn_danger:hover {
+    background: #be123c;
+}
+.rpm-m__btn:focus-visible {
+    outline: 2px solid #4f46e5;
+    outline-offset: 2px;
+}

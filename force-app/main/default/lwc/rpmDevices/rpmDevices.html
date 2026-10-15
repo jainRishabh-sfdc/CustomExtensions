@@ -1,26 +1,26 @@
 <template>
-    <p class="rpm-intro">Hand out cuffs safely and spot the ones that stopped sending. A silent cuff means missing readings — and missing readings mean missed billing days.</p>
+    <p class="rpm-lede">A silent cuff means missing reading days. Swap or fix it before the month closes so the patient still reaches 16 days.</p>
     <template lwc:if={error}>
-        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">{error}</div>
+        <div class="rpm-alertbox rpm-error" role="alert">{error}</div>
     </template>
     <template lwc:if={loading}>
         <lightning-spinner alternative-text="Loading devices" size="small"></lightning-spinner>
     </template>
 
-    <div class="rpm-kpis">
-        <div class="rpm-kpi rpm-kpi_ok"><div class="rpm-kpi__v">{stockCount}</div><div class="rpm-kpi__l">In the office, ready to hand out</div></div>
-        <div class="rpm-kpi"><div class="rpm-kpi__v">{healthyCount}</div><div class="rpm-kpi__l">With patients, working fine</div></div>
-        <div class="rpm-kpi rpm-kpi_crit"><div class="rpm-kpi__v">{attentionCount}</div><div class="rpm-kpi__l">Need attention (silent or low battery)</div></div>
-        <div class="rpm-kpi rpm-kpi_warn"><div class="rpm-kpi__v">{returnCount}</div><div class="rpm-kpi__l">Returned, waiting on vendor</div></div>
+    <div class="rpm-stats">
+        <div class="rpm-stat rpm-stat_emerald"><div class="rpm-stat__v">{stockCount}</div><div class="rpm-stat__l">Ready on the shelf</div></div>
+        <div class="rpm-stat rpm-stat_indigo"><div class="rpm-stat__v">{healthyCount}</div><div class="rpm-stat__l">With patients, sending fine</div></div>
+        <div class="rpm-stat rpm-stat_rose"><div class="rpm-stat__v">{attentionCount}</div><div class="rpm-stat__l">Silent or low battery</div></div>
+        <div class="rpm-stat rpm-stat_amber"><div class="rpm-stat__v">{returnCount}</div><div class="rpm-stat__l">Sent back to the vendor</div></div>
     </div>
 
-    <div class="rpm-panel">
-        <div class="rpm-panel__head">Devices with patients</div>
-        <div class="rpm-panel__sub">"Silent" = no reading for {silentDays}+ days. Needing attention are listed first.</div>
-        <div class="rpm-panel__body rpm-scroll">
+    <div class="rpm-card">
+        <div class="rpm-card__h"><h2>With patients</h2></div>
+        <div class="rpm-card__sub">Silent means no reading for {silentDays} or more days. Problems are listed first.</div>
+        <div class="rpm-card__b rpm-card__b_flush rpm-scroll">
             <table class="rpm-table">
                 <thead>
-                    <tr><th>Patient</th><th>Device</th><th>Last reading</th><th>Battery</th><th>Status</th><th></th></tr>
+                    <tr><th>Patient</th><th>Cuff</th><th>Last reading</th><th>Battery</th><th>Status</th><th></th></tr>
                 </thead>
                 <tbody>
                     <template for:each={fieldRows} for:item="d">
@@ -28,59 +28,61 @@
                             <td><button class="rpm-link" data-id={d.patientId} onclick={openPatient}>{d.patientName}</button></td>
                             <td><span class="rpm-mono">{d.label}</span><div class="rpm-muted">IMEI {d.imei}</div></td>
                             <td class="rpm-mono">{d.lastText}</td>
-                            <td class="rpm-mono">{d.batteryText}</td>
+                            <td>
+                                <div class="rpm-battery">
+                                    <div class="rpm-track rpm-battery__track"><i class={d.batteryFill} style={d.batteryStyle}></i></div>
+                                    <span class="rpm-mono">{d.batteryText}</span>
+                                </div>
+                            </td>
                             <td><span class={d.statusClass}>{d.statusText}</span></td>
-                            <td><lightning-button label="Broken? Return it" data-id={d.id} data-label={d.label} onclick={returnDevice}></lightning-button></td>
+                            <td class="rpm-right">
+                                <button class="rpm-btn rpm-btn_sm" data-id={d.id} data-label={d.label} onclick={returnDevice}>Return cuff</button>
+                            </td>
                         </tr>
                     </template>
                 </tbody>
             </table>
-            <template lwc:if={noField}><div class="rpm-empty">No devices are out with patients yet.</div></template>
+            <template lwc:if={noField}><div class="rpm-empty">No cuffs are out with patients yet.</div></template>
         </div>
     </div>
 
-    <div class="rpm-panel">
-        <div class="rpm-panel__head">Office stock — ready to hand out</div>
-        <div class="rpm-panel__sub">Handing out walks a 4-step checklist: right device, right patient, trained and tested, live.</div>
-        <div class="rpm-panel__body rpm-scroll">
-            <table class="rpm-table">
-                <thead>
-                    <tr><th>Device</th><th>Model</th><th>Where</th><th></th></tr>
-                </thead>
-                <tbody>
-                    <template for:each={stockRows} for:item="d">
-                        <tr key={d.id}>
-                            <td><span class="rpm-mono">{d.label}</span><div class="rpm-muted">IMEI {d.imei}</div></td>
-                            <td>{d.model}</td>
-                            <td>{d.location}</td>
-                            <td><lightning-button variant="brand" label="Hand out…" data-id={d.id} onclick={handOut}></lightning-button></td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
-            <template lwc:if={noStock}><div class="rpm-empty">Shelf is empty. Add devices with status "In Stock" on the RPM Devices tab.</div></template>
+    <div class="rpm-grid2">
+        <div class="rpm-card">
+            <div class="rpm-card__h"><h2>On the shelf</h2></div>
+            <div class="rpm-card__sub">Handing out walks four checks: right cuff, right patient, trained, live.</div>
+            <div class="rpm-card__b rpm-card__b_flush rpm-scroll">
+                <table class="rpm-table">
+                    <tbody>
+                        <template for:each={stockRows} for:item="d">
+                            <tr key={d.id}>
+                                <td>
+                                    <div class="rpm-mono rpm-strong">{d.label}</div>
+                                    <div class="rpm-muted">{d.model}, IMEI {d.imei}</div>
+                                </td>
+                                <td class="rpm-right"><button class="rpm-btn rpm-btn_primary rpm-btn_sm" data-id={d.id} onclick={handOut}>Hand out</button></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <template lwc:if={noStock}><div class="rpm-empty">Shelf is empty. Add cuffs with status In Stock on the RPM Devices tab.</div></template>
+            </div>
         </div>
-    </div>
-
-    <div class="rpm-panel">
-        <div class="rpm-panel__head">Returned devices</div>
-        <div class="rpm-panel__body rpm-scroll">
-            <table class="rpm-table">
-                <thead>
-                    <tr><th>Device</th><th>IMEI</th><th>Status</th><th>Note</th></tr>
-                </thead>
-                <tbody>
-                    <template for:each={returnRows} for:item="d">
-                        <tr key={d.id}>
-                            <td class="rpm-mono">{d.label}</td>
-                            <td class="rpm-mono">{d.imei}</td>
-                            <td><span class="rpm-chip rpm-chip_warn">{d.status}</span></td>
-                            <td>{d.location}</td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
-            <template lwc:if={noReturns}><div class="rpm-empty">None — everything's healthy.</div></template>
+        <div class="rpm-card">
+            <div class="rpm-card__h"><h2>Returned</h2></div>
+            <div class="rpm-card__sub">Waiting on the vendor for a replacement.</div>
+            <div class="rpm-card__b rpm-card__b_flush rpm-scroll">
+                <table class="rpm-table">
+                    <tbody>
+                        <template for:each={returnRows} for:item="d">
+                            <tr key={d.id}>
+                                <td class="rpm-mono rpm-strong">{d.label}</td>
+                                <td>{d.location}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <template lwc:if={noReturns}><div class="rpm-empty">None. Every cuff is working.</div></template>
+            </div>
         </div>
     </div>
 </template>

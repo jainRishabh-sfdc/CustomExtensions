@@ -1,49 +1,69 @@
 <template>
-    <lightning-modal-header label="Hand out a device — safety checklist"></lightning-modal-header>
+    <lightning-modal-header label="Hand out a cuff"></lightning-modal-header>
     <lightning-modal-body>
-        <div class="rpm-progress">
-            <template for:each={bars} for:item="b">
-                <i key={b.key} class={b.cls}></i>
+        <div class="rpm-m">
+            <div class="rpm-steps4">
+                <template for:each={steps} for:item="s">
+                    <div key={s.key} class={s.cls}>{s.label}</div>
+                </template>
+            </div>
+
+            <template lwc:if={isStep1}>
+                <p class="rpm-m__lead">
+                    Check the box label matches <strong class="rpm-m__mono">{deviceLabel}</strong><br />
+                    <span class="rpm-m__sub">{model}, IMEI {imei}</span>
+                </p>
+            </template>
+
+            <template lwc:if={isStep2}>
+                <label class="rpm-m__field">
+                    Patient
+                    <select onchange={handlePatient}>
+                        <option value="">Choose a patient</option>
+                        <template for:each={patientOptions} for:item="p">
+                            <option key={p.value} value={p.value} selected={p.selected}>{p.label}</option>
+                        </template>
+                    </select>
+                </label>
+                <label class="rpm-m__check">
+                    <input type="checkbox" checked={identity} onchange={handleIdentity} />
+                    I confirmed name and date of birth with the patient
+                </label>
+            </template>
+
+            <template lwc:if={isStep3}>
+                <label class="rpm-m__check">
+                    <input type="checkbox" checked={training} onchange={handleTraining} />
+                    Patient took a seated reading and showed it back to me
+                </label>
+                <label class="rpm-m__check">
+                    <input type="checkbox" checked={testReading} onchange={handleTest} />
+                    The test reading arrived under the right name
+                </label>
+                <label class="rpm-m__check">
+                    <input type="checkbox" checked={loaner} onchange={handleLoaner} />
+                    Patient knows the cuff is a practice-owned loaner
+                </label>
+            </template>
+
+            <template lwc:if={isStep4}>
+                <p class="rpm-m__lead">{deviceLabel} will be linked to <strong>{patientName}</strong>. Every reading from now on lands in their chart.</p>
+            </template>
+
+            <template lwc:if={error}>
+                <div class="rpm-m__err">{error}</div>
             </template>
         </div>
-
-        <template lwc:if={isStep1}>
-            <p class="rpm-sub">Step 1 of 4 — confirm you are holding the right device.</p>
-            <p class="rpm-device">
-                Device <strong>{deviceLabel}</strong> · {model}<br />
-                <span class="rpm-sub">IMEI {imei}</span>
-            </p>
-        </template>
-
-        <template lwc:if={isStep2}>
-            <p class="rpm-sub">Step 2 of 4 — who is this device for? Confirm identity with two identifiers (name and date of birth).</p>
-            <lightning-combobox label="Patient" options={patientOptions} value={patientId} onchange={handlePatient} required></lightning-combobox>
-            <lightning-input type="checkbox" label="I checked name and date of birth" checked={identity} onchange={handleIdentity}></lightning-input>
-        </template>
-
-        <template lwc:if={isStep3}>
-            <p class="rpm-sub">Step 3 of 4 — training and test reading.</p>
-            <lightning-input type="checkbox" label="Showed the patient how to take a seated reading, and they showed me back (teach-back)" checked={training} onchange={handleTraining}></lightning-input>
-            <lightning-input type="checkbox" label="A test reading reached the console under the right name" checked={testReading} onchange={handleTest}></lightning-input>
-            <lightning-input type="checkbox" label="Patient acknowledged this is a practice-owned loaner" checked={loaner} onchange={handleLoaner}></lightning-input>
-        </template>
-
-        <template lwc:if={isStep4}>
-            <p class="rpm-sub">Step 4 of 4 — go live.</p>
-            <p>{deviceLabel} will be linked to <strong>{patientName}</strong>. From the next reading on, everything lands in their chart.</p>
-        </template>
-
-        <template lwc:if={error}>
-            <div class="rpm-err">{error}</div>
-        </template>
     </lightning-modal-body>
     <lightning-modal-footer>
-        <lightning-button label="Cancel" onclick={cancel}></lightning-button>
-        <template lwc:if={isStep4}>
-            <lightning-button class="rpm-next" variant="brand" label="Hand out and go live" onclick={finish}></lightning-button>
-        </template>
-        <template lwc:else>
-            <lightning-button class="rpm-next" variant="brand" label={nextLabel} onclick={next}></lightning-button>
-        </template>
+        <div class="rpm-m__foot">
+            <button class="rpm-m__btn" onclick={cancel}>Cancel</button>
+            <template lwc:if={isStep4}>
+                <button class="rpm-m__btn rpm-m__btn_primary" onclick={finish}>Hand out and go live</button>
+            </template>
+            <template lwc:else>
+                <button class="rpm-m__btn rpm-m__btn_primary" onclick={next}>{nextLabel}</button>
+            </template>
+        </div>
     </lightning-modal-footer>
 </template>

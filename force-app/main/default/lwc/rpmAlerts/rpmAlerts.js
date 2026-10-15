@@ -58,7 +58,7 @@ export default class RpmAlerts extends LightningElement {
     }
 
     get filterButtons() {
-        return FILTERS.map((f) => ({ ...f, variant: f.value === this.current ? 'brand' : 'neutral' }));
+        return FILTERS.map((f) => ({ ...f, cls: f.value === this.current ? 'rpm-seg__on' : '' }));
     }
 
     changeFilter(event) {
@@ -71,21 +71,24 @@ export default class RpmAlerts extends LightningElement {
             const idx = a.stepIndex < 0 ? 0 : a.stepIndex;
             const critical = a.severity === 'Critical' && a.category === 'Health';
             const closed = a.step === 'Closed';
+            const meta = [`raised ${formatDateTime(a.raisedAt)}`];
+            if (a.dueAt) {
+                meta.push(`respond by ${formatDateTime(a.dueAt)}`);
+            }
+            if (a.owner) {
+                meta.push(`owner ${a.owner}`);
+            }
             return {
                 ...a,
-                cardClass: critical && !closed ? 'rpm-card rpm-card_crit' : 'rpm-card',
+                cardClass: critical && !closed ? 'rpm-alert rpm-alert_crit' : 'rpm-alert',
                 chipClass: severityClass(a.severity),
-                chipLabel: severityLabel(a.severity),
-                raisedText: formatDateTime(a.raisedAt),
-                dueText: a.dueAt ? 'respond by ' + formatDateTime(a.dueAt) : 'no response time',
-                stepNumber: idx + 1,
-                stepAria: `Progress: step ${idx + 1} of 6`,
-                dots: STEPS.map((s, i) => ({
+                severityText: severityLabel(a.severity),
+                metaText: meta.join(', '),
+                stepAria: `Step ${idx + 1} of 6, ${a.step}`,
+                segments: STEPS.map((s, i) => ({
                     key: s,
-                    text: i < idx || closed ? '✓' : String(i + 1),
-                    cls: i < idx || closed ? 'rpm-dot rpm-dot_done' : i === idx ? 'rpm-dot rpm-dot_cur' : 'rpm-dot',
-                    line: i < STEPS.length - 1,
-                    lineCls: i < idx ? 'rpm-line rpm-line_done' : 'rpm-line'
+                    label: s,
+                    cls: i < idx || closed ? 'rpm-st rpm-st_done' : i === idx ? 'rpm-st rpm-st_cur' : 'rpm-st'
                 })),
                 isClosed: closed,
                 isDevice: !closed && a.category === 'Device',
@@ -94,13 +97,14 @@ export default class RpmAlerts extends LightningElement {
                 atAssigned: a.step === 'Assigned',
                 atCalled: a.step === 'Patient Called',
                 atReviewed: a.step === 'Provider Reviewed',
-                callLabel: critical ? 'Record patient call (required)' : 'Record patient call',
-                callVariant: critical ? 'destructive' : 'brand',
+                callClass: critical ? 'rpm-btn rpm-btn_danger' : 'rpm-btn rpm-btn_primary',
+                historyCount: (a.history || []).length,
                 historyRows: (a.history || []).map((h) => ({
                     id: h.id,
                     when: formatDateTime(h.at),
-                    by: h.by,
-                    text: (h.from ? `${h.from} → ${h.to}` : h.to) + (h.detail ? ` — ${h.detail}` : '')
+                    by: h.by || 'system',
+                    step: h.to,
+                    detail: h.detail || (h.from ? `${h.from} to ${h.to}` : 'Raised')
                 }))
             };
         });
@@ -108,6 +112,10 @@ export default class RpmAlerts extends LightningElement {
 
     get noCards() {
         return !this.loading && this.alerts.length === 0;
+    }
+
+    get emptyText() {
+        return this.current === 'closed' ? 'No closed alerts yet.' : 'Nothing open in this view.';
     }
 
     find(id) {
@@ -118,6 +126,7 @@ export default class RpmAlerts extends LightningElement {
         try {
             await action();
             this.toast(successMessage, 'success');
+            this.dispatchEvent(new CustomEvent('rpmrefresh', { bubbles: true, composed: true }));
             await this.load();
         } catch (e) {
             this.toast(reduceError(e), 'error');
@@ -130,7 +139,7 @@ export default class RpmAlerts extends LightningElement {
     }
 
     chooseOwner(event) {
-        this.owners = { ...this.owners, [event.target.dataset.id]: event.detail.value };
+        this.owners = { ...this.owners, [event.target.dataset.id]: event.target.value };
     }
 
     assign(event) {
@@ -175,7 +184,7 @@ export default class RpmAlerts extends LightningElement {
     }
 
     chooseDisposition(event) {
-        this.dispositions = { ...this.dispositions, [event.target.dataset.id]: event.detail.value };
+        this.dispositions = { ...this.dispositions, [event.target.dataset.id]: event.target.value };
     }
 
     closeAlert(event) {

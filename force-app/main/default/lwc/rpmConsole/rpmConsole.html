@@ -1,24 +1,46 @@
 <template>
-    <div class="rpm-shell">
-        <header class="rpm-header">
-            <div class="rpm-brand">
-                RPM Command
-                <span class="rpm-brand__sub">Remote blood-pressure monitoring — alerts, devices and billing in one place</span>
+    <div class={shellClass}>
+        <header class="rpm-head">
+            <div class="rpm-head__row">
+                <div class="rpm-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12h4l2.5-6 4 12 2.5-6H21"></path>
+                    </svg>
+                </div>
+                <div class="rpm-title">
+                    RPM Command<span class="rpm-pill-dark">CPT rules 2026.1</span>
+                    <small>Remote blood-pressure monitoring: triage, devices and monthly billing</small>
+                </div>
+                <div class="rpm-head__right">
+                    <div class="rpm-timer" aria-label="Care time stopwatch">
+                        <div>
+                            <span class="rpm-timer__l">{timerFor}</span>
+                            <span class={timerValueClass}>{timerText}</span>
+                        </div>
+                        <button class="rpm-timer__btn" onclick={toggleTimer}>{timerButton}</button>
+                        <button class="rpm-timer__btn rpm-timer__btn_primary" onclick={applyTimer}>Log it</button>
+                    </div>
+                    <div class="rpm-theme" role="group" aria-label="Colour mode">
+                        <button class={dayClass} data-theme="day" onclick={setTheme}>Day</button>
+                        <button class={nightClass} data-theme="night" onclick={setTheme}>Night shift</button>
+                    </div>
+                </div>
             </div>
+            <nav class="rpm-tabs" role="tablist" aria-label="RPM boards">
+                <template for:each={tabs} for:item="t">
+                    <button key={t.key} role="tab" class={t.cls} aria-selected={t.selected} data-tab={t.key} onclick={handleTab}>
+                        {t.label}
+                        <template lwc:if={t.badge}><span class="rpm-tabs__n">{t.badge}</span></template>
+                    </button>
+                </template>
+            </nav>
         </header>
-        <nav class="rpm-nav" role="tablist" aria-label="RPM boards">
-            <template for:each={tabs} for:item="t">
-                <button key={t.key} role="tab" class={t.cls} aria-selected={t.selected} data-tab={t.key} onclick={handleTab}>
-                    {t.label}
-                </button>
-            </template>
-        </nav>
-        <main class="rpm-main" onrpmnavigate={handleNavigate}>
+        <main class="rpm-main" onrpmnavigate={handleNavigate} onrpmpatientselect={handlePatientSelect} onrpmrefresh={loadCounts}>
             <template lwc:if={isToday}>
                 <c-rpm-today></c-rpm-today>
             </template>
             <template lwc:if={isPatients}>
-                <c-rpm-patients patient-id={patientId} risk={patientRisk}></c-rpm-patients>
+                <c-rpm-patients patient-id={patientId} risk={patientRisk} preset-minutes={presetMinutes}></c-rpm-patients>
             </template>
             <template lwc:if={isAlerts}>
                 <c-rpm-alerts filter={alertFilter}></c-rpm-alerts>

@@ -3,11 +3,25 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getPatients from '@salesforce/apex/RpmConsoleController.getPatients';
 import getPatientDetail from '@salesforce/apex/RpmConsoleController.getPatientDetail';
 import logTimeApex from '@salesforce/apex/RpmConsoleController.logTime';
-import { reduceError, formatDateTime, formatDate, riskClass, severityClass, daysAgo, navigate, ACTIVITIES } from 'c/rpmUtils';
+import {
+    reduceError,
+    formatDateTime,
+    formatDate,
+    riskClass,
+    riskLabel,
+    severityClass,
+    severityLabel,
+    daysAgo,
+    navigate,
+    parseCodes,
+    meter,
+    ACTIVITIES
+} from 'c/rpmUtils';
 
 export default class RpmPatients extends LightningElement {
     @api patientId;
     @api risk;
+    @api presetMinutes;
 
     patients = [];
     selectedId;
@@ -23,9 +37,10 @@ export default class RpmPatients extends LightningElement {
     note = '';
     saving = false;
 
-    activityOptions = ACTIVITIES;
-
     connectedCallback() {
+        if (this.presetMinutes) {
+            this.minutes = this.presetMinutes;
+        }
         this.loadPatients();
     }
 
@@ -48,6 +63,9 @@ export default class RpmPatients extends LightningElement {
         try {
             this.detail = await getPatientDetail({ patientId: id, days: this.days });
             this.error = undefined;
+            this.dispatchEvent(
+                new CustomEvent('rpmpatientselect', { detail: { id: this.detail.id, name: this.detail.name }, bubbles: true, composed: true })
+            );
         } catch (e) {
             this.error = reduceError(e);
         } finally {
@@ -57,6 +75,10 @@ export default class RpmPatients extends LightningElement {
 
     // ---------- roster
 
+    get riskText() {
+        return riskLabel(this.risk).toLowerCase();
+    }
+
     get rosterRows() {
         const q = this.search.toLowerCase();
         return this.patients
@@ -65,13 +87,16 @@ export default class RpmPatients extends LightningElement {
                 const ago = daysAgo(p.lastReading);
                 return {
                     ...p,
-                    rowClass: p.id === this.selectedId ? 'rpm-roster__row rpm-roster__row_on' : 'rpm-roster__row',
+                    rowClass: p.id === this.selectedId ? 'rpm-rrow rpm-rrow_on' : 'rpm-rrow',
                     riskClass: riskClass(p.risk),
-                    subtitle: [p.payer, ago === null ? 'no readings yet' : ago === 0 ? 'read today' : `last read ${ago}d ago`]
-                        .filter((x) => x)
-                        .join(' · ')
+                    riskText: riskLabel(p.risk),
+                    subtitle: [p.payer, ago === null ? 'no readings yet' : ago === 0 ? 'read today' : `last read ${ago}d ago`].filter((x) => x).join(', ')
                 };
             });
+    }
+
+    get rosterCount() {
+        return this.rosterRows.length;
     }
 
     get noPatients() {
@@ -100,13 +125,17 @@ export default class RpmPatients extends LightningElement {
         return riskClass(this.detail.risk);
     }
 
+    get detailRiskText() {
+        return riskLabel(this.detail.risk);
+    }
+
     get noConsent() {
         return !this.detail.consentDate;
     }
 
-    get detailSubtitle() {
+    get detailFacts() {
         const d = this.detail;
-        return [d.sex, d.diagnoses, d.payer, d.payerType].filter((x) => x).join(' · ');
+        return [d.sex, d.diagnoses, d.payer, d.payerType].filter((x) => x).join(', ');
     }
 
     get recordUrl() {
@@ -114,14 +143,14 @@ export default class RpmPatients extends LightningElement {
     }
 
     get rangeButtons() {
-        return [7, 30, 90].map((d) => ({ days: d, label: `${d} days`, variant: d === this.days ? 'brand' : 'neutral' }));
+        return [7, 30, 90].map((d) => ({ days: d, label: `${d} days`, cls: d === this.days ? 'rpm-seg__on' : '' }));
     }
 
-    get deviceChips() {
+    get deviceTags() {
         return (this.detail.devices || []).map((d) => ({
             id: d.id,
-            text: `${d.serial || d.name} · battery ${d.battery ?? '?'}%${d.silent ? ' · silent' : ''}`,
-            cls: d.silent || d.lowBattery ? 'rpm-chip rpm-chip_crit' : 'rpm-chip rpm-chip_ok'
+            text: `Cuff ${d.serial || d.name}, ${d.battery ?? '?'}% battery${d.silent ? ', silent' : ''}`,
+            cls: d.silent || d.lowBattery ? 'rpm-tag rpm-tag_amber' : 'rpm-tag rpm-tag_slate'
         }));
     }
 
@@ -130,46 +159,28 @@ export default class RpmPatients extends LightningElement {
         this.loadDetail(this.selectedId);
     }
 
-    // ---------- readings & stats
+    // ---------- readout strip under the chart
 
-    get readingRows() {
-        return [...(this.detail.readings || [])].reverse().map((r) => ({
-            ...r,
-            when: formatDateTime(r.at),
-            flagLabel: r.flag === 'critical' ? 'CRITICAL' : r.flag === 'high' ? 'above call line' : r.flag === 'low' ? 'below low line' : null,
-            flagClass: r.flag === 'critical' ? 'rpm-chip rpm-chip_crit' : 'rpm-chip rpm-chip_hot'
-        }));
-    }
-
-    get noReadings() {
-        return !this.detail.readings || this.detail.readings.length === 0;
-    }
-
-    get stats() {
+    get readout() {
         const rs = this.detail.readings || [];
-        const sys = rs.map((r) => Number(r.sys)).filter((v) => !isNaN(v));
-        const dia = rs.map((r) => Number(r.dia)).filter((v) => !isNaN(v));
-        const calc = (vals) => {
-            if (!vals.length) {
-                return { avg: '—', max: '—', med: '—', min: '—' };
-            }
-            const s = [...vals].sort((a, b) => a - b);
-            const mid = Math.floor(s.length / 2);
-            const med = s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
-            return { avg: (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1), max: s[s.length - 1], med, min: s[0] };
+        const avg = (k) => {
+            const vals = rs.map((r) => Number(r[k])).filter((v) => !isNaN(v));
+            return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : '—';
         };
-        const a = calc(sys);
-        const b = calc(dia);
+        const last = rs.length ? rs[rs.length - 1] : null;
         return [
-            { label: 'Average', sys: a.avg, dia: b.avg },
-            { label: 'Highest', sys: a.max, dia: b.max },
-            { label: 'Typical (median)', sys: a.med, dia: b.med },
-            { label: 'Lowest', sys: a.min, dia: b.min },
-            { label: 'Readings', sys: sys.length, dia: dia.length }
+            { k: 'Latest', v: last ? `${last.sys}/${last.dia ?? '?'}` : '—' },
+            { k: 'Average systolic', v: avg('sys') },
+            { k: 'Average diastolic', v: avg('dia') },
+            { k: 'Readings in range', v: rs.length }
         ];
     }
 
     // ---------- care time
+
+    get activityOptions() {
+        return ACTIVITIES.map((a) => ({ ...a, selected: a.value === this.activity }));
+    }
 
     get timeRows() {
         return (this.detail.time || []).map((t) => ({ ...t, when: formatDate(t.date) }));
@@ -180,7 +191,7 @@ export default class RpmPatients extends LightningElement {
     }
 
     handleActivity(event) {
-        this.activity = event.detail.value;
+        this.activity = event.target.value;
         if (this.activity === 'Phone call with patient' || this.activity === 'Call with caregiver') {
             this.interactive = true;
         }
@@ -198,7 +209,7 @@ export default class RpmPatients extends LightningElement {
     async logTime() {
         const mins = parseInt(this.minutes, 10);
         if (!mins || mins < 1 || mins > 240) {
-            this.toast('Check minutes', 'Enter between 1 and 240 minutes.', 'warning');
+            this.toast('Enter between 1 and 240 minutes', 'warning');
             return;
         }
         this.saving = true;
@@ -211,10 +222,11 @@ export default class RpmPatients extends LightningElement {
                 note: this.note
             });
             this.note = '';
-            this.toast('Time logged', `${mins} min logged for ${this.detail.name}`, 'success');
+            this.minutes = 5;
+            this.toast(`Logged ${mins} min for ${this.detail.name}`, 'success');
             await this.loadDetail(this.detail.id);
         } catch (e) {
-            this.toast('Could not log time', reduceError(e), 'error');
+            this.toast(reduceError(e), 'error');
         } finally {
             this.saving = false;
         }
@@ -226,25 +238,35 @@ export default class RpmPatients extends LightningElement {
         return this.detail.billing || { readingDays: 0, minutes: 0, status: 'Accruing', rulesVersion: '' };
     }
 
-    get daysBarStyle() {
-        const pct = Math.min(100, (Number(this.billing.readingDays || 0) / 16) * 100);
-        return `width:${pct}%;background:${pct >= 100 ? '#177245' : '#9a6b10'}`;
+    get daysMeter() {
+        return meter(this.billing.readingDays, 16);
     }
 
-    get minutesBarStyle() {
-        const pct = Math.min(100, (Number(this.billing.minutes || 0) / 20) * 100);
-        return `width:${pct}%;background:${pct >= 100 ? '#177245' : '#9a6b10'}`;
+    get minutesMeter() {
+        return meter(this.billing.minutes, 20);
+    }
+
+    get codePills() {
+        return parseCodes(this.billing.codes);
+    }
+
+    get hasCodes() {
+        return this.codePills.length > 0;
     }
 
     get billingStatusClass() {
         const s = this.billing.status;
-        return s === 'Ready to Bill' || s === 'Billed' ? 'rpm-chip rpm-chip_ok' : s === 'Blocked' ? 'rpm-chip rpm-chip_crit' : 'rpm-chip rpm-chip_warn';
+        return s === 'Ready to Bill' || s === 'Billed' ? 'rpm-tag rpm-tag_emerald' : s === 'Blocked' ? 'rpm-tag rpm-tag_rose' : 'rpm-tag rpm-tag_amber';
     }
 
     // ---------- alerts
 
     get alertRows() {
-        return (this.detail.alerts || []).map((a) => ({ ...a, chipClass: severityClass(a.severity) }));
+        return (this.detail.alerts || []).map((a) => ({ ...a, chipClass: severityClass(a.severity), severityText: severityLabel(a.severity), dueText: formatDateTime(a.dueAt) }));
+    }
+
+    get alertCount() {
+        return this.alertRows.length;
     }
 
     get noAlerts() {
@@ -252,10 +274,10 @@ export default class RpmPatients extends LightningElement {
     }
 
     goAlerts() {
-        navigate(this, 'alerts', {});
+        navigate(this, 'alerts', { filter: 'open' });
     }
 
-    toast(title, message, variant) {
-        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+    toast(message, variant) {
+        this.dispatchEvent(new ShowToastEvent({ title: message, variant }));
     }
 }

@@ -1,58 +1,83 @@
-# Salesforce DX Project
+# RPM Command — Salesforce core (Option B)
 
-Salesforce DX is a development approach that brings source-driven development, team collaboration, and continuous integration to the Salesforce Platform. Instead of working directly in an org through a web browser, you work with metadata as source files in a local DX project, track changes in version control, and deploy through automated processes.
+Remote patient monitoring for commercial / non-ACCESS RPM patients, built as a Salesforce 2GP managed package so any clinic can run it and any EMR can connect to it.
 
-This project template gets you started with the tools and structure you need to build Salesforce applications using source control, scratch orgs, and the Salesforce CLI.
+This drop is the backend core. No UI yet.
 
-## Prerequisites
+## What's in it
 
-Before you start, make sure you have:
+Data model (`force-app/main/default/objects`)
+1. RPM_Patient__c — patient synced from the EMR (external id `EMR_Patient_Id__c`), consent date, billing lock (double-billing guard), BP targets, risk level
+2. RPM_Device__c — cuff/scale by IMEI, stock status, battery, signal, last reading
+3. RPM_Device_Assignment__c — who held which device and when, plus the handout checklist
+4. RPM_Reading__c — each measurement, raw payload kept, dedupe by vendor event id
+5. RPM_Alert__c — alert with severity, rule, 6-step workflow, SLA due time, protocol version, call record
+6. RPM_Alert_Event__c — append-only history (update/delete blocked by trigger)
+7. RPM_Time_Entry__c — care minutes, interactive-communication flag
+8. RPM_Billing_Period__c — monthly reading-days, minutes, eligible CPT codes
+9. RPM_Protocol__mdt — alert thresholds per clinic (Default record included)
 
-- **Salesforce CLI** - Download from [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) for details.
-- **VS Code with Salesforce Extension Pack** - See [Installation Instructions](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/install.html) for details. Includes the Agentforce Vibes extension.
-- **A development org** - Sign up for a free Developer Edition org [here](https://developer.salesforce.com/signup).
-- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub.  See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
+Apex (`classes`)
+1. RpmReadingApi — `POST /services/apexrest/rpm/v1/readings` (one object or array of up to 200)
+2. RpmReadingService — validate, dedupe, match reading to patient at measurement time, update device telemetry
+3. RpmAlertEngine — critical / high / low systolic, rising trend, silent device, low battery
+4. RpmAlertWorkflow — New → Checked → Assigned → Patient Called → Provider Reviewed → Closed; critical needs the full call record
+5. RpmBillingEngine — 99453, 99454, 99445, 99470, 99457, 99458 (rules version CPT-2026.1)
+6. RpmRiskService — GREEN / YELLOW / RED
+7. RpmNightlyBatch — nightly device check, billing recalc, risk refresh
+8. Tests for all of the above (RpmTestFactory + 6 test classes)
 
-## Project Structure
+Permission sets: RPM_Admin, RPM_Clinician, RPM_Integration.
 
-Your DX project follows this structure:
+Console UI (`lwc`, `tabs`, `applications`)
+1. RPM Command app with the "RPM Command" console tab plus RPM Patients and RPM Devices object tabs
+2. rpmConsole — shell with five boards: Today, Patients, Alerts, Devices, Billing
+3. rpmToday — clickable KPIs and the to-do list (critical first, then by due time)
+4. rpmPatients — roster with risk, BP chart (rpmBpChart), readings, stats, care-time logging, monthly billing card
+5. rpmAlerts — six-step cards with the next action on each; critical call form (rpmCallModal)
+6. rpmDevices — devices with patients, office stock, 4-step handout checklist (rpmHandoutModal), returns
+7. rpmBilling — reading days, minutes, eligible codes and status per patient
+8. RpmConsoleController (+ test) — the Apex behind the console
+9. Look: Day / Night shift toggle (remembered per browser), care-time stopwatch in the header ("Log it" fills the minutes on the open patient), shared colour tokens in rpmConsole.css, building blocks in rpmStyles, modal look in rpmModalStyles
+10. rpmFonts static resource — Plus Jakarta Sans and JetBrains Mono (SIL Open Font License), loaded by rpmConsole
 
-- **`force-app/main/default/`** - Your metadata source files live in this default package directory. You can configure additional package directories in the `sfdx-project.json` file.
-- **`config/`** - Scratch org definitions and project settings
-- **`scripts/`** - Automation scripts for common tasks
-- **`sfdx-project.json`** - Project manifest that defines package directories, namespace, API version, and other project-level settings
+## Run it
 
-See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm).
+```bash
+sf org login web --set-default-dev-hub --alias devhub
+sf org create scratch --definition-file config/project-scratch-def.json --alias rpm --set-default --duration-days 30
+sf project deploy start
+sf org assign permset --name RPM_Admin
+sf apex run test --test-level RunLocalTests --code-coverage --result-format human --wait 20
+```
 
-## Get Started
+Schedule the nightly job (Anonymous Apex):
 
-Ready to start developing? The [Get Started with Salesforce DX](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_get_started_dx.htm) guide walks you through your first project, from creating a scratch org to creating a simple Apex class or LWC to deploying your code to a sandbox.
+```apex
+System.schedule('RPM nightly', '0 0 2 * * ?', new RpmNightlyBatch());
+```
 
-## Common Salesforce CLI Commands
+## Post a reading
 
-Here are common CLI commands that you'll use the most:
+```bash
+sf api request rest /services/apexrest/rpm/v1/readings --method POST --body '{
+  "eventId":"sm-88123","imei":"356938035643809","measuredAt":"2026-08-09T07:41:00Z",
+  "type":"Blood Pressure","systolic":181,"diastolic":112,"pulse":96,"battery":91,"signal":-69}'
+```
 
-- `sf org login web`: Authorize an org
-- `sf org open`: Open your org in a browser
-- `sf org create scratch`: Create a scratch org
-- `sf project deploy start`: Deploy metadata to your org
-- `sf project retrieve start`: Retrieve metadata from your org
-- `sf template generate <artifact>`: Scaffold new components, such as Apex classes and triggers, LWC components, Lightning apps, and more
-- `sf apex <command>`: Run Apex tests, run anonymous Apex blocks, and view logs
-- `sf data <command>`: Work with test data
-- `sf alias <command>`: Manage org aliases
-- `sf config <command>`: Configure CLI settings
+Response: `{"received":1,"created":1,"duplicates":0,"unmatched":0,"alertsRaised":1,"errors":[]}`
 
-## Use Agentforce Vibes to Build Lightning Apps
+## Things to verify before go-live
 
-Transform your ideas into custom Lightning apps that extend CRM workflows directly in Lightning Experience. Through natural conversations with Agentforce Vibes, implement custom objects and fields, complex business logic, and dynamic UI components. See [Build a Lightning App Using Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/lexapp-overview.html).
+1. Billing rules — re-check against the CY2027 final rule and each commercial payer. Per-payer overrides are not built yet.
+2. Alert thresholds — the Default protocol (150 call line, 180 emergency) must be signed off by the client's medical director.
+3. Device vendor payload — Smart Meter's webhook format must be mapped to `RpmReadingInput` in the gateway; the gateway is not in this repo.
+4. Namespace — set `namespace` in `sfdx-project.json` once you register one in a namespace org, before creating the first package version.
 
-## Additional Resources
+## Next builds
 
-- [Agentforce Vibes Developer Guide](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/einstein-overview.html)
-- [Salesforce CLI Installation Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/)
-- [Salesforce CLI Plugin Development Guide](https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/conceptual-overview.html)
-- [Salesforce VS Code Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-
+1. Device orders (bulk to office / direct to patient) and vendor RMA tracking
+2. Notes / outreach log and audit exports (PDF / CSV)
+3. Device gateway (AWS Lambda) for Smart Meter webhooks
+4. EMR connectors: CSV patient import first, then Epic / athena FHIR
+5. Per-payer billing rules

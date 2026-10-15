@@ -6,108 +6,111 @@
 }
 .rpm-filters {
     display: flex;
-    gap: 0.5rem;
+    gap: 10px;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 0.9rem;
+    margin-bottom: 16px;
 }
-.rpm-card {
-    background: #fbfcfa;
-    border: 1px solid #e2e7e0;
-    border-radius: 0.7rem;
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.75rem;
+.rpm-alert {
+    background: var(--rpm-surface);
+    border: 1px solid var(--rpm-line);
+    border-radius: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--rpm-shadow);
+    overflow: hidden;
 }
-.rpm-card_crit {
-    border-color: #b3261e;
-    background: #fff7f6;
+.rpm-alert_crit {
+    border-color: var(--rpm-rose-line);
+    box-shadow: inset 4px 0 0 var(--rpm-rose), var(--rpm-shadow);
 }
-.rpm-card__head {
+.rpm-alert__top {
+    padding: 15px 18px 0;
     display: flex;
+    gap: 8px;
+    align-items: center;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.4rem;
 }
-.rpm-card__title {
-    font-weight: 700;
+.rpm-alert__k {
+    font-weight: 800;
+    font-size: 0.98rem;
+    letter-spacing: -0.01em;
 }
-.rpm-card__meta {
-    margin-top: 0.25rem;
-}
-.rpm-steps {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    margin: 0.65rem 0 0.2rem;
-}
-.rpm-step {
-    display: inline-flex;
-    align-items: center;
-}
-.rpm-dot {
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%;
-    background: #e2e7e0;
-    color: #fff;
-    font-size: 0.68rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.rpm-dot_done {
-    background: #177245;
-}
-.rpm-dot_cur {
-    background: #134e4a;
-    outline: 3px solid #e4eeec;
-}
-.rpm-line {
-    width: 0.9rem;
-    height: 2px;
-    background: #e2e7e0;
-}
-.rpm-line_done {
-    background: #177245;
-}
-.rpm-step__label {
+.rpm-alert__meta {
+    padding: 5px 18px 0;
     font-size: 0.8rem;
-    color: #5c6864;
-    margin-left: 0.5rem;
+    color: var(--rpm-ink-3);
 }
-.rpm-card__actions {
+.rpm-track6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    padding: 14px 18px 4px;
+}
+.rpm-st {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    align-items: center;
-    margin-top: 0.6rem;
+    flex-direction: column;
+    gap: 6px;
 }
-.rpm-inline {
-    min-width: 14rem;
+.rpm-st__bar {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--rpm-surface-3);
 }
-.rpm-history {
-    margin-top: 0.6rem;
-}
-.rpm-history summary {
-    cursor: pointer;
-    font-size: 0.75rem;
-    color: #134e4a;
+.rpm-st span {
+    font-size: 0.7rem;
+    color: var(--rpm-ink-4);
     font-weight: 600;
 }
-.rpm-history ul {
-    margin: 0.4rem 0 0 1.1rem;
-    font-size: 0.76rem;
-    color: #5c6864;
-    line-height: 1.7;
-    list-style: disc;
+.rpm-st_done .rpm-st__bar {
+    background: var(--rpm-emerald);
 }
-.rpm-rules {
+.rpm-st_done span {
+    color: var(--rpm-ink-3);
+}
+.rpm-st_cur .rpm-st__bar {
+    background: var(--rpm-indigo);
+}
+.rpm-st_cur span {
+    color: var(--rpm-indigo-ink);
+    font-weight: 800;
+}
+.rpm-alert__act {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 12px 18px 16px;
+}
+.rpm-inline {
+    min-width: 220px;
+}
+.rpm-log {
+    border-top: 1px solid var(--rpm-line);
+    background: var(--rpm-surface-2);
+}
+.rpm-log summary {
+    cursor: pointer;
+    padding: 11px 18px;
     font-size: 0.8rem;
-    background: #e8eef8;
-    border: 1px solid #c9d6ec;
-    border-radius: 0.6rem;
-    padding: 0.6rem 0.8rem;
-    color: #2c4370;
-    margin-top: 0.75rem;
+    font-weight: 700;
+    color: var(--rpm-ink-2);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+}
+.rpm-log summary::-webkit-details-marker {
+    display: none;
+}
+.rpm-log summary::after {
+    content: 'Show';
+    color: var(--rpm-indigo);
+    font-weight: 700;
+}
+.rpm-log[open] summary::after {
+    content: 'Hide';
+}
+@media (max-width: 640px) {
+    .rpm-track6 {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }

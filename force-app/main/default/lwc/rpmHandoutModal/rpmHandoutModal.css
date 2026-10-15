@@ -1,31 +1,49 @@
-.rpm-progress {
-    display: flex;
-    gap: 0.4rem;
-    margin-bottom: 0.9rem;
+@import 'c/rpmModalStyles';
+
+.rpm-steps4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 18px;
 }
-.rpm-bar {
-    flex: 1;
+.rpm-step4 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+.rpm-step4::before {
+    content: '';
+    display: block;
     height: 5px;
-    border-radius: 3px;
-    background: #e2e7e0;
+    border-radius: 999px;
+    background: #e8ecf1;
+    margin-bottom: 7px;
 }
-.rpm-bar_done {
-    background: #134e4a;
+.rpm-step4_on {
+    color: #3730a3;
 }
-.rpm-sub {
-    font-size: 0.82rem;
-    color: #5c6864;
-    margin-bottom: 0.6rem;
+.rpm-step4_on::before {
+    background: #4f46e5;
 }
-.rpm-device {
+.rpm-m__lead {
     font-size: 0.95rem;
+    line-height: 1.6;
 }
-.rpm-err {
-    margin-top: 0.75rem;
-    color: #b3261e;
-    font-weight: 600;
-    font-size: 0.82rem;
+.rpm-m__mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
-.rpm-next {
-    margin-left: 0.5rem;
+.rpm-m__check {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.86rem;
+    margin: 10px 0;
+    line-height: 1.45;
+    color: #334155;
+}
+.rpm-m__check input {
+    margin-top: 3px;
+    accent-color: #4f46e5;
+    width: 16px;
+    height: 16px;
 }

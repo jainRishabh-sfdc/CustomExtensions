@@ -1,173 +1,529 @@
-/* Shared look for RPM Command. Import with: @import 'c/rpmStyles'; */
-.rpm-panel {
-    background: #fff;
-    border: 1px solid #e2e7e0;
-    border-radius: 0.75rem;
-    margin-bottom: 1rem;
-    overflow: hidden;
+/*
+ * Shared building blocks for the RPM Command console.
+ * Import with: @import 'c/rpmStyles';
+ * Colour tokens (--rpm-*) are defined once on the console shell (rpmConsole)
+ * and switch for Day / Night shift. Custom properties inherit into every
+ * child component, so nothing here hard-codes a colour.
+ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
-.rpm-panel__head {
-    padding: 0.75rem 1rem 0.25rem;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: #16211f;
-}
-.rpm-panel__sub {
-    padding: 0 1rem 0.65rem;
-    font-size: 0.78rem;
-    color: #5c6864;
-    border-bottom: 1px solid #eef1ec;
-}
-.rpm-panel__body {
-    padding: 0.85rem 1rem;
-}
-.rpm-intro {
-    color: #5c6864;
-    font-size: 0.85rem;
-    margin-bottom: 0.75rem;
-}
-.rpm-kpis {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-.rpm-kpi {
-    background: #fff;
-    border: 1px solid #e2e7e0;
-    border-radius: 0.75rem;
-    padding: 0.8rem 1rem;
-    text-align: left;
-    cursor: pointer;
-    width: 100%;
-}
-.rpm-kpi:hover {
-    box-shadow: 0 3px 10px rgba(22, 33, 31, 0.1);
-}
-.rpm-kpi__v {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
-    font-size: 1.6rem;
-    font-weight: 600;
-    line-height: 1.1;
-}
-.rpm-kpi__l {
-    font-size: 0.75rem;
-    color: #5c6864;
-    margin-top: 0.2rem;
-}
-.rpm-kpi_crit .rpm-kpi__v {
-    color: #b3261e;
-}
-.rpm-kpi_hot .rpm-kpi__v {
-    color: #c2410c;
-}
-.rpm-kpi_warn .rpm-kpi__v {
-    color: #9a6b10;
-}
-.rpm-kpi_ok .rpm-kpi__v {
-    color: #177245;
-}
-.rpm-chip {
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    white-space: nowrap;
-}
-.rpm-chip_ok {
-    background: #e7f3ec;
-    color: #177245;
-}
-.rpm-chip_warn {
-    background: #fbf1dc;
-    color: #9a6b10;
-}
-.rpm-chip_hot {
-    background: #fceadf;
-    color: #c2410c;
-}
-.rpm-chip_crit {
-    background: #fbe7e5;
-    color: #b3261e;
-}
-.rpm-chip_neu {
-    background: #edf0f4;
-    color: #64748b;
-}
-.rpm-chip_pine {
-    background: #e4eeec;
-    color: #134e4a;
+
+/* ---------- text ---------- */
+.rpm-lede {
+    color: var(--rpm-ink-3);
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+    max-width: 68ch;
+    line-height: 1.6;
 }
 .rpm-muted {
-    color: #5c6864;
-    font-size: 0.78rem;
+    color: var(--rpm-ink-3);
+    font-size: 0.8rem;
 }
 .rpm-mono {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-family: var(--rpm-mono);
     font-size: 0.8rem;
 }
 .rpm-link {
-    color: #134e4a;
-    font-weight: 600;
+    color: var(--rpm-indigo);
+    font-weight: 700;
     text-decoration: underline;
-    cursor: pointer;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     background: none;
     border: none;
     padding: 0;
+    cursor: pointer;
+    font: inherit;
+}
+.rpm-sep {
+    margin: 0 6px;
+    color: var(--rpm-ink-4);
+}
+.rpm-link:hover {
+    color: var(--rpm-indigo-hover);
+}
+
+/* ---------- stat tiles ---------- */
+.rpm-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.rpm-stat {
+    background: var(--rpm-surface);
+    border: 1px solid var(--rpm-line);
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    color: var(--rpm-ink);
+    font: inherit;
+}
+.rpm-stat::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--rpm-line-2);
+}
+button.rpm-stat {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+button.rpm-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--rpm-shadow);
+}
+.rpm-stat_rose::before {
+    background: var(--rpm-rose);
+}
+.rpm-stat_amber::before {
+    background: var(--rpm-amber);
+}
+.rpm-stat_emerald::before {
+    background: var(--rpm-emerald);
+}
+.rpm-stat_indigo::before {
+    background: var(--rpm-indigo);
+}
+.rpm-stat__v {
+    font-family: var(--rpm-mono);
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+.rpm-stat_rose .rpm-stat__v {
+    color: var(--rpm-rose);
+}
+.rpm-stat_amber .rpm-stat__v {
+    color: var(--rpm-amber);
+}
+.rpm-stat_emerald .rpm-stat__v {
+    color: var(--rpm-emerald);
+}
+.rpm-stat_indigo .rpm-stat__v {
+    color: var(--rpm-indigo);
+}
+.rpm-stat__l {
+    font-size: 0.78rem;
+    color: var(--rpm-ink-3);
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+/* ---------- cards ---------- */
+.rpm-card {
+    background: var(--rpm-surface);
+    border: 1px solid var(--rpm-line);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--rpm-shadow);
+}
+.rpm-card__h {
+    padding: 16px 18px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.rpm-card__h h2 {
+    font-size: 1.02rem;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    margin: 0;
+}
+.rpm-card__sub {
+    padding: 5px 18px 13px;
+    font-size: 0.8rem;
+    color: var(--rpm-ink-3);
+    border-bottom: 1px solid var(--rpm-line);
+}
+.rpm-card__b {
+    padding: 16px 18px;
+}
+.rpm-card__b_flush {
+    padding: 0;
+}
+.rpm-empty {
+    padding: 28px;
+    text-align: center;
+    color: var(--rpm-ink-3);
+    font-size: 0.88rem;
+}
+
+/* ---------- tags & CPT pills ---------- */
+.rpm-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+.rpm-tag_rose {
+    background: var(--rpm-rose-soft);
+    color: var(--rpm-rose-ink);
+    border-color: var(--rpm-rose-line);
+}
+.rpm-tag_amber {
+    background: var(--rpm-amber-soft);
+    color: var(--rpm-amber-ink);
+    border-color: var(--rpm-amber-line);
+}
+.rpm-tag_emerald {
+    background: var(--rpm-emerald-soft);
+    color: var(--rpm-emerald-ink);
+    border-color: var(--rpm-emerald-line);
+}
+.rpm-tag_indigo {
+    background: var(--rpm-indigo-soft);
+    color: var(--rpm-indigo-ink);
+    border-color: var(--rpm-indigo-line);
+}
+.rpm-tag_slate {
+    background: var(--rpm-slate-soft);
+    color: var(--rpm-slate-ink);
+    border-color: var(--rpm-line);
+}
+.rpm-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+}
+.rpm-cpts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.rpm-cpt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--rpm-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 4px 9px 4px 10px;
+    border-radius: 8px;
+    background: var(--rpm-indigo-soft);
+    color: var(--rpm-indigo-ink);
+    border: 1px solid var(--rpm-indigo-line);
+}
+.rpm-cpt__label {
+    font-family: var(--rpm-sans);
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--rpm-ink-3);
+}
+
+/* ---------- tables ---------- */
+.rpm-scroll {
+    overflow-x: auto;
 }
 .rpm-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.83rem;
+    font-size: 0.85rem;
 }
 .rpm-table th {
-    font-size: 0.66rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #8a948f;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--rpm-ink-3);
     text-align: left;
-    padding: 0.4rem 0.5rem;
-    border-bottom: 1px solid #e2e7e0;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rpm-line);
+    background: var(--rpm-surface-2);
+    letter-spacing: 0.01em;
 }
 .rpm-table td {
-    padding: 0.5rem;
-    border-bottom: 1px solid #eef1ec;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rpm-line);
     vertical-align: middle;
 }
-.rpm-scroll {
-    overflow-x: auto;
+.rpm-table tbody tr:last-child td {
+    border-bottom: none;
 }
-.rpm-bar {
-    height: 0.5rem;
-    background: #eef1ec;
-    border-radius: 0.3rem;
+.rpm-table tbody tr:hover td {
+    background: var(--rpm-surface-2);
+}
+.rpm-right {
+    text-align: right;
+}
+
+/* ---------- meters ---------- */
+.rpm-meter {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 130px;
+}
+.rpm-meter__top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    color: var(--rpm-ink-3);
+}
+.rpm-meter__top b {
+    font-family: var(--rpm-mono);
+    font-weight: 600;
+    color: var(--rpm-ink);
+}
+.rpm-track {
+    height: 7px;
+    border-radius: 999px;
+    background: var(--rpm-surface-3);
+    position: relative;
     overflow: hidden;
-    min-width: 80px;
 }
-.rpm-bar__fill {
-    display: block;
-    height: 100%;
+.rpm-track__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 999px;
+    background: var(--rpm-amber);
+    transition: width 0.3s ease;
 }
-.rpm-empty {
-    padding: 1.25rem;
-    text-align: center;
-    color: #8a948f;
+.rpm-track__fill_full {
+    background: var(--rpm-emerald);
+}
+.rpm-track__fill_low {
+    background: var(--rpm-rose);
+}
+
+/* ---------- buttons & inputs (plain HTML, matches the design) ---------- */
+.rpm-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 15px;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.82rem;
+    border: 1px solid var(--rpm-line-2);
+    background: var(--rpm-surface);
+    color: var(--rpm-ink);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.rpm-btn:hover {
+    background: var(--rpm-surface-2);
+}
+.rpm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.rpm-btn_primary {
+    background: var(--rpm-indigo);
+    border-color: var(--rpm-indigo);
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(79, 70, 229, 0.25);
+}
+.rpm-btn_primary:hover {
+    background: var(--rpm-indigo-hover);
+    border-color: var(--rpm-indigo-hover);
+}
+.rpm-btn_danger {
+    background: var(--rpm-rose);
+    border-color: var(--rpm-rose);
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(225, 29, 72, 0.25);
+}
+.rpm-btn_danger:hover {
+    background: var(--rpm-rose);
+    filter: brightness(1.05);
+}
+.rpm-btn_sm {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 0.76rem;
+}
+.rpm-btn:focus-visible,
+.rpm-seg button:focus-visible,
+.rpm-link:focus-visible,
+.rpm-stat:focus-visible {
+    outline: 2px solid var(--rpm-indigo);
+    outline-offset: 2px;
+}
+.rpm-seg {
+    display: inline-flex;
+    border: 1px solid var(--rpm-line-2);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--rpm-surface);
+}
+.rpm-seg button {
+    padding: 0 14px;
+    height: 32px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--rpm-ink-3);
+    background: none;
+    border: none;
+    border-right: 1px solid var(--rpm-line-2);
+    cursor: pointer;
+}
+.rpm-seg button:last-child {
+    border-right: none;
+}
+.rpm-seg button:hover {
+    color: var(--rpm-ink);
+    background: var(--rpm-surface-2);
+}
+.rpm-seg button.rpm-seg__on {
+    background: var(--rpm-indigo);
+    color: #fff;
+}
+.rpm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--rpm-ink-2);
+}
+.rpm-field select,
+.rpm-field input,
+.rpm-select {
+    height: 38px;
+    border: 1px solid var(--rpm-line-2);
+    border-radius: 10px;
+    padding: 0 12px;
+    background: var(--rpm-surface);
+    color: var(--rpm-ink);
+    font: inherit;
+    font-weight: 500;
+    font-size: 0.86rem;
+}
+.rpm-field select:focus,
+.rpm-field input:focus,
+.rpm-select:focus {
+    border-color: var(--rpm-indigo);
+    box-shadow: 0 0 0 3px var(--rpm-indigo-soft);
+    outline: none;
+}
+.rpm-check {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
     font-size: 0.85rem;
+    margin: 10px 0;
+    line-height: 1.45;
+    color: var(--rpm-ink-2);
+}
+.rpm-check input {
+    margin-top: 3px;
+    accent-color: var(--rpm-indigo);
+    width: 16px;
+    height: 16px;
+}
+
+/* ---------- notices ---------- */
+.rpm-alertbox {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--rpm-rose-soft);
+    color: var(--rpm-rose-ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--rpm-rose-line);
+}
+.rpm-infobox {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--rpm-indigo-ink);
+    background: var(--rpm-indigo-soft);
+    border: 1px solid var(--rpm-indigo-line);
+    border-radius: 12px;
+    padding: 13px 15px;
+    margin-top: 8px;
 }
 .rpm-filterbar {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: #e4eeec;
-    border: 1px solid #134e4a;
-    border-radius: 0.5rem;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-    color: #134e4a;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
+    gap: 10px;
+    margin: 0 0 14px;
 }
-.rpm-filterbar lightning-button {
+.rpm-filterbar .rpm-btn {
     margin-left: auto;
+}
+
+/* ---------- timeline (alert history, billing audit) ---------- */
+.rpm-timeline {
+    padding: 2px 18px 14px;
+}
+.rpm-tl {
+    display: grid;
+    grid-template-columns: 110px 14px 1fr;
+    gap: 10px;
+    font-size: 0.8rem;
+    padding: 5px 0;
+}
+.rpm-tl_nodate {
+    grid-template-columns: 14px 1fr;
+}
+.rpm-tl__t {
+    font-family: var(--rpm-mono);
+    font-size: 0.72rem;
+    color: var(--rpm-ink-3);
+    padding-top: 1px;
+}
+.rpm-tl__p {
+    position: relative;
+}
+.rpm-tl__p::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rpm-indigo);
+}
+.rpm-tl__p::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 14px;
+    bottom: -12px;
+    width: 2px;
+    background: var(--rpm-line-2);
+}
+.rpm-tl:last-child .rpm-tl__p::after {
+    display: none;
+}
+.rpm-tl__d b {
+    font-weight: 700;
+}
+
+/* ---------- errors from Apex ---------- */
+.rpm-error {
+    margin-bottom: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    button.rpm-stat,
+    .rpm-track__fill {
+        transition: none;
+    }
 }
