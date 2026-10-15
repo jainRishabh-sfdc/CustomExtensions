@@ -1,0 +1,173 @@
+/* Shared look for RPM Command. Import with: @import 'c/rpmStyles'; */
+.rpm-panel {
+    background: #fff;
+    border: 1px solid #e2e7e0;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+.rpm-panel__head {
+    padding: 0.75rem 1rem 0.25rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #16211f;
+}
+.rpm-panel__sub {
+    padding: 0 1rem 0.65rem;
+    font-size: 0.78rem;
+    color: #5c6864;
+    border-bottom: 1px solid #eef1ec;
+}
+.rpm-panel__body {
+    padding: 0.85rem 1rem;
+}
+.rpm-intro {
+    color: #5c6864;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+}
+.rpm-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.rpm-kpi {
+    background: #fff;
+    border: 1px solid #e2e7e0;
+    border-radius: 0.75rem;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+}
+.rpm-kpi:hover {
+    box-shadow: 0 3px 10px rgba(22, 33, 31, 0.1);
+}
+.rpm-kpi__v {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+.rpm-kpi__l {
+    font-size: 0.75rem;
+    color: #5c6864;
+    margin-top: 0.2rem;
+}
+.rpm-kpi_crit .rpm-kpi__v {
+    color: #b3261e;
+}
+.rpm-kpi_hot .rpm-kpi__v {
+    color: #c2410c;
+}
+.rpm-kpi_warn .rpm-kpi__v {
+    color: #9a6b10;
+}
+.rpm-kpi_ok .rpm-kpi__v {
+    color: #177245;
+}
+.rpm-chip {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.rpm-chip_ok {
+    background: #e7f3ec;
+    color: #177245;
+}
+.rpm-chip_warn {
+    background: #fbf1dc;
+    color: #9a6b10;
+}
+.rpm-chip_hot {
+    background: #fceadf;
+    color: #c2410c;
+}
+.rpm-chip_crit {
+    background: #fbe7e5;
+    color: #b3261e;
+}
+.rpm-chip_neu {
+    background: #edf0f4;
+    color: #64748b;
+}
+.rpm-chip_pine {
+    background: #e4eeec;
+    color: #134e4a;
+}
+.rpm-muted {
+    color: #5c6864;
+    font-size: 0.78rem;
+}
+.rpm-mono {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+}
+.rpm-link {
+    color: #134e4a;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+.rpm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+}
+.rpm-table th {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8a948f;
+    text-align: left;
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid #e2e7e0;
+}
+.rpm-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eef1ec;
+    vertical-align: middle;
+}
+.rpm-scroll {
+    overflow-x: auto;
+}
+.rpm-bar {
+    height: 0.5rem;
+    background: #eef1ec;
+    border-radius: 0.3rem;
+    overflow: hidden;
+    min-width: 80px;
+}
+.rpm-bar__fill {
+    display: block;
+    height: 100%;
+}
+.rpm-empty {
+    padding: 1.25rem;
+    text-align: center;
+    color: #8a948f;
+    font-size: 0.85rem;
+}
+.rpm-filterbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #e4eeec;
+    border: 1px solid #134e4a;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    color: #134e4a;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+.rpm-filterbar lightning-button {
+    margin-left: auto;
+}

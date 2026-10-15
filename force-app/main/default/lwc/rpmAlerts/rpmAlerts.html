@@ -1,0 +1,109 @@
+<template>
+    <p class="rpm-intro">
+        Every unusual reading walks the same six steps — New, Checked, Assigned, Patient called, Provider reviewed, Closed — so
+        nothing gets dropped. The buttons on each card are always the next step.
+    </p>
+    <template lwc:if={error}>
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">{error}</div>
+    </template>
+
+    <div class="rpm-filters">
+        <lightning-button-group>
+            <template for:each={filterButtons} for:item="f">
+                <lightning-button key={f.value} label={f.label} variant={f.variant} data-value={f.value} onclick={changeFilter}></lightning-button>
+            </template>
+        </lightning-button-group>
+        <lightning-button-icon icon-name="utility:refresh" alternative-text="Refresh" onclick={load}></lightning-button-icon>
+    </div>
+
+    <template lwc:if={loading}>
+        <lightning-spinner alternative-text="Loading alerts" size="small"></lightning-spinner>
+    </template>
+
+    <template for:each={cards} for:item="a">
+        <div key={a.id} class={a.cardClass}>
+            <div class="rpm-card__head">
+                <span class={a.chipClass}>{a.chipLabel}</span>
+                <span class="rpm-card__title">{a.summary}</span>
+                <span class="rpm-muted">·</span>
+                <button class="rpm-link" data-id={a.patientId} onclick={openPatient}>{a.patientName}</button>
+                <span class="rpm-muted">· raised {a.raisedText}</span>
+                <template lwc:if={a.overdue}><span class="rpm-chip rpm-chip_crit">OVERDUE</span></template>
+            </div>
+            <div class="rpm-muted rpm-card__meta">
+                {a.dueText} · rule {a.rule} · protocol {a.protocolVersion}<template lwc:if={a.owner}> · owner {a.owner}</template>
+            </div>
+
+            <div class="rpm-steps" aria-label={a.stepAria}>
+                <template for:each={a.dots} for:item="d">
+                    <span key={d.key} class="rpm-step">
+                        <span class={d.cls}>{d.text}</span>
+                        <template lwc:if={d.line}><span class={d.lineCls}></span></template>
+                    </span>
+                </template>
+                <span class="rpm-step__label">Step {a.stepNumber} of 6 — <strong>{a.step}</strong></span>
+            </div>
+
+            <div class="rpm-card__actions">
+                <template lwc:if={a.isClosed}>
+                    <span class="rpm-chip rpm-chip_neu">Done — {a.disposition}</span>
+                </template>
+                <template lwc:elseif={a.isDevice}>
+                    <lightning-button variant="brand" label="Mark fixed and close" data-id={a.id} onclick={fixDevice}></lightning-button>
+                    <lightning-button label="Go to Devices" onclick={goDevices}></lightning-button>
+                </template>
+                <template lwc:elseif={a.atNew}>
+                    <lightning-button variant="brand" label="Mark checked" data-id={a.id} onclick={markChecked}></lightning-button>
+                </template>
+                <template lwc:elseif={a.atChecked}>
+                    <lightning-combobox
+                        class="rpm-inline"
+                        label="Owner"
+                        variant="label-hidden"
+                        placeholder="Choose owner"
+                        options={team}
+                        data-id={a.id}
+                        onchange={chooseOwner}
+                    ></lightning-combobox>
+                    <lightning-button variant="brand" label="Assign" data-id={a.id} onclick={assign}></lightning-button>
+                </template>
+                <template lwc:elseif={a.atAssigned}>
+                    <lightning-button variant={a.callVariant} label={a.callLabel} data-id={a.id} onclick={recordCall}></lightning-button>
+                </template>
+                <template lwc:elseif={a.atCalled}>
+                    <lightning-button variant="brand" label="Provider reviewed ✓" data-id={a.id} onclick={reviewed}></lightning-button>
+                </template>
+                <template lwc:elseif={a.atReviewed}>
+                    <lightning-combobox
+                        class="rpm-inline"
+                        label="What was done"
+                        variant="label-hidden"
+                        placeholder="What was done?"
+                        options={dispositionOptions}
+                        data-id={a.id}
+                        onchange={chooseDisposition}
+                    ></lightning-combobox>
+                    <lightning-button variant="brand" label="Close alert" data-id={a.id} onclick={closeAlert}></lightning-button>
+                </template>
+            </div>
+
+            <details class="rpm-history">
+                <summary>Full history (permanent record)</summary>
+                <ul>
+                    <template for:each={a.historyRows} for:item="h">
+                        <li key={h.id}><span class="rpm-mono">{h.when}</span> · {h.text}<template lwc:if={h.by}> · {h.by}</template></li>
+                    </template>
+                </ul>
+            </details>
+        </div>
+    </template>
+    <template lwc:if={noCards}>
+        <div class="rpm-panel"><div class="rpm-empty">Nothing here — all clear.</div></div>
+    </template>
+
+    <div class="rpm-rules">
+        Critical alerts need the full call record (reached, symptoms, provider notified) before they can move on. Health alerts
+        walk all six steps; device alerts can be closed once the device is fixed. The response time for each alert comes from the
+        active protocol.
+    </div>
+</template>

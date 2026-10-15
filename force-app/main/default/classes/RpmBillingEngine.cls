@@ -163,7 +163,10 @@ public with sharing class RpmBillingEngine {
             ));
         }
         if (!out.isEmpty()) {
-            Database.upsert(out, RPM_Billing_Period__c.Period_Key__c, true, AccessLevel.USER_MODE);
+            // Billing periods are system-computed (like risk): clinicians read them but
+            // never edit them directly, so the write runs in system mode. All source
+            // data above was read in user mode.
+            Database.upsert(out, RPM_Billing_Period__c.Period_Key__c, true, AccessLevel.SYSTEM_MODE);
         }
         return out;
     }

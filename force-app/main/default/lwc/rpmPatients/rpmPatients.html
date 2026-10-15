@@ -1,0 +1,198 @@
+<template>
+    <p class="rpm-intro">Pick a patient to see their blood-pressure story, open alerts, care time and this month's billing.</p>
+    <template lwc:if={error}>
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">{error}</div>
+    </template>
+    <template lwc:if={risk}>
+        <div class="rpm-filterbar">
+            Showing: patients at {risk} risk
+            <lightning-button label="Show all" onclick={clearRisk}></lightning-button>
+        </div>
+    </template>
+
+    <div class="rpm-layout">
+        <div class="rpm-panel rpm-roster">
+            <div class="rpm-panel__head">Patients</div>
+            <div class="rpm-roster__search">
+                <lightning-input type="search" label="Search patients" variant="label-hidden" placeholder="Search by name" onchange={handleSearch}></lightning-input>
+            </div>
+            <div class="rpm-roster__list">
+                <template for:each={rosterRows} for:item="p">
+                    <button key={p.id} class={p.rowClass} data-id={p.id} onclick={selectPatient}>
+                        <span class="rpm-roster__who">
+                            <span class="rpm-roster__name">{p.name}</span>
+                            <span class="rpm-muted">{p.subtitle}</span>
+                        </span>
+                        <span class={p.riskClass} title={p.reasons}>● {p.risk}</span>
+                    </button>
+                </template>
+                <template lwc:if={noPatients}>
+                    <div class="rpm-empty">No patients match.</div>
+                </template>
+            </div>
+        </div>
+
+        <div class="rpm-detail">
+            <template lwc:if={loadingDetail}>
+                <lightning-spinner alternative-text="Loading patient" size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={detail}>
+                <div class="rpm-panel">
+                    <div class="rpm-panel__head rpm-head-row">
+                        <span>{detail.name}</span>
+                        <span class={detailRiskClass}>● {detail.risk}</span>
+                        <template lwc:if={detail.locked}>
+                            <span class="rpm-chip rpm-chip_neu">RPM billing locked 🔒</span>
+                        </template>
+                        <template lwc:else>
+                            <span class="rpm-chip rpm-chip_ok">RPM billing active</span>
+                        </template>
+                        <template lwc:if={noConsent}>
+                            <span class="rpm-chip rpm-chip_crit">No consent on file</span>
+                        </template>
+                    </div>
+                    <div class="rpm-panel__sub">
+                        {detailSubtitle}
+                        <template lwc:if={detail.reasons}> — attention because: {detail.reasons}</template>
+                    </div>
+                    <div class="rpm-panel__body">
+                        <div class="rpm-toolbar">
+                            <lightning-button-group>
+                                <template for:each={rangeButtons} for:item="r">
+                                    <lightning-button key={r.days} label={r.label} variant={r.variant} data-days={r.days} onclick={changeRange}></lightning-button>
+                                </template>
+                            </lightning-button-group>
+                            <template for:each={deviceChips} for:item="d">
+                                <span key={d.id} class={d.cls}>{d.text}</span>
+                            </template>
+                            <a class="rpm-link" href={recordUrl} target="_blank">Open record</a>
+                        </div>
+                        <c-rpm-bp-chart
+                            readings={detail.readings}
+                            alert-line={detail.alertLine}
+                            critical-line={detail.criticalLine}
+                            low-line={detail.lowLine}
+                            target-high={detail.targetSysHigh}
+                            target-low={detail.targetSysLow}
+                        ></c-rpm-bp-chart>
+                        <div class="rpm-muted rpm-protocol">Alert protocol {detail.protocolVersion}</div>
+                    </div>
+                </div>
+
+                <div class="rpm-grid2">
+                    <div class="rpm-panel">
+                        <div class="rpm-panel__head">Readings</div>
+                        <div class="rpm-panel__sub">Newest first.</div>
+                        <div class="rpm-panel__body rpm-scroll rpm-readings">
+                            <table class="rpm-table">
+                                <thead>
+                                    <tr><th>When</th><th>Top</th><th>Bottom</th><th>Pulse</th><th></th></tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={readingRows} for:item="r">
+                                        <tr key={r.id}>
+                                            <td class="rpm-mono">{r.when}</td>
+                                            <td class="rpm-mono">{r.sys}</td>
+                                            <td class="rpm-mono">{r.dia}</td>
+                                            <td class="rpm-mono">{r.pulse}</td>
+                                            <td>
+                                                <template lwc:if={r.flagLabel}><span class={r.flagClass}>{r.flagLabel}</span></template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                            <template lwc:if={noReadings}><div class="rpm-empty">No readings in range.</div></template>
+                        </div>
+                    </div>
+                    <div class="rpm-panel">
+                        <div class="rpm-panel__head">Numbers at a glance</div>
+                        <div class="rpm-panel__sub">From the selected range.</div>
+                        <div class="rpm-panel__body">
+                            <table class="rpm-table">
+                                <thead>
+                                    <tr><th></th><th>Top</th><th>Bottom</th></tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={stats} for:item="s">
+                                        <tr key={s.label}>
+                                            <td>{s.label}</td>
+                                            <td class="rpm-mono">{s.sys}</td>
+                                            <td class="rpm-mono">{s.dia}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rpm-grid2">
+                    <div class="rpm-panel">
+                        <div class="rpm-panel__head">Care time this month — {totalMinutes} min</div>
+                        <div class="rpm-panel__sub">Tick "Talked with patient" for live calls; management codes need it.</div>
+                        <div class="rpm-panel__body">
+                            <div class="rpm-form">
+                                <lightning-combobox label="What did you do?" options={activityOptions} value={activity} onchange={handleActivity}></lightning-combobox>
+                                <lightning-input type="number" label="Minutes" min="1" max="240" value={minutes} onchange={handleMinutes}></lightning-input>
+                            </div>
+                            <lightning-input type="checkbox" label="Talked with patient or caregiver (interactive)" checked={interactive} onchange={handleInteractive}></lightning-input>
+                            <lightning-input label="Note (optional)" max-length="255" value={note} onchange={handleNote}></lightning-input>
+                            <div class="rpm-actions">
+                                <lightning-button variant="brand" label="Log time" onclick={logTime} disabled={saving}></lightning-button>
+                            </div>
+                            <template for:each={timeRows} for:item="t">
+                                <div key={t.id} class="rpm-log">
+                                    <div class="rpm-mono rpm-muted">{t.when} · {t.minutes} min · {t.by}</div>
+                                    <div>{t.activity}<template lwc:if={t.interactive}> · interactive</template><template lwc:if={t.note}> — {t.note}</template></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="rpm-panel">
+                        <div class="rpm-panel__head">This month's billing</div>
+                        <div class="rpm-panel__sub">Rules {billing.rulesVersion}. Codes update as readings and minutes come in.</div>
+                        <div class="rpm-panel__body">
+                            <template lwc:if={billing.blockedReason}>
+                                <div class="rpm-chip rpm-chip_crit">Blocked: {billing.blockedReason}</div>
+                            </template>
+                            <div class="rpm-meter">
+                                <div class="rpm-muted">Reading days: <span class="rpm-mono">{billing.readingDays} / 16</span></div>
+                                <div class="rpm-bar"><span class="rpm-bar__fill" style={daysBarStyle}></span></div>
+                            </div>
+                            <div class="rpm-meter">
+                                <div class="rpm-muted">Care minutes: <span class="rpm-mono">{billing.minutes} / 20</span></div>
+                                <div class="rpm-bar"><span class="rpm-bar__fill" style={minutesBarStyle}></span></div>
+                            </div>
+                            <div class="rpm-codes">
+                                Eligible codes:
+                                <template lwc:if={billing.codes}><span class="rpm-chip rpm-chip_pine">{billing.codes}</span></template>
+                                <template lwc:else><span class="rpm-muted">none yet</span></template>
+                                <span class={billingStatusClass}>{billing.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rpm-panel">
+                    <div class="rpm-panel__head">Open alerts for {detail.name}</div>
+                    <div class="rpm-panel__body">
+                        <template for:each={alertRows} for:item="a">
+                            <div key={a.id} class="rpm-log">
+                                <span class={a.chipClass}>{a.severity}</span>
+                                <span class="rpm-alert__text">{a.summary} · step {a.step}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={noAlerts}><div class="rpm-empty">No open alerts.</div></template>
+                        <template lwc:else>
+                            <div class="rpm-actions"><lightning-button label="Work these alerts" onclick={goAlerts}></lightning-button></div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            <template lwc:elseif={noSelection}>
+                <div class="rpm-panel"><div class="rpm-empty">Choose a patient on the left.</div></div>
+            </template>
+        </div>
+    </div>
+</template>

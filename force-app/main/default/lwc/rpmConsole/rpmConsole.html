@@ -1,0 +1,34 @@
+<template>
+    <div class="rpm-shell">
+        <header class="rpm-header">
+            <div class="rpm-brand">
+                RPM Command
+                <span class="rpm-brand__sub">Remote blood-pressure monitoring — alerts, devices and billing in one place</span>
+            </div>
+        </header>
+        <nav class="rpm-nav" role="tablist" aria-label="RPM boards">
+            <template for:each={tabs} for:item="t">
+                <button key={t.key} role="tab" class={t.cls} aria-selected={t.selected} data-tab={t.key} onclick={handleTab}>
+                    {t.label}
+                </button>
+            </template>
+        </nav>
+        <main class="rpm-main" onrpmnavigate={handleNavigate}>
+            <template lwc:if={isToday}>
+                <c-rpm-today></c-rpm-today>
+            </template>
+            <template lwc:if={isPatients}>
+                <c-rpm-patients patient-id={patientId} risk={patientRisk}></c-rpm-patients>
+            </template>
+            <template lwc:if={isAlerts}>
+                <c-rpm-alerts filter={alertFilter}></c-rpm-alerts>
+            </template>
+            <template lwc:if={isDevices}>
+                <c-rpm-devices></c-rpm-devices>
+            </template>
+            <template lwc:if={isBilling}>
+                <c-rpm-billing></c-rpm-billing>
+            </template>
+        </main>
+    </div>
+</template>

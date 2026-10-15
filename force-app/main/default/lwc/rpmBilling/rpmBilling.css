@@ -1,0 +1,9 @@
+@import 'c/rpmStyles';
+
+:host {
+    display: block;
+    position: relative;
+}
+.rpm-kpi {
+    cursor: default;
+}

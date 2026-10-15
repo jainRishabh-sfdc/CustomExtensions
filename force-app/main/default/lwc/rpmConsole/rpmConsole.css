@@ -1,0 +1,53 @@
+:host {
+    display: block;
+    font-family: 'IBM Plex Sans', 'Salesforce Sans', Arial, sans-serif;
+    color: #16211f;
+}
+.rpm-shell {
+    background: #f5f7f4;
+    min-height: 100%;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+.rpm-header {
+    background: #134e4a;
+    color: #eaf3f1;
+    padding: 0.9rem 1.25rem 0.4rem;
+}
+.rpm-brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.rpm-brand__sub {
+    display: block;
+    font-weight: 400;
+    font-size: 0.72rem;
+    opacity: 0.8;
+}
+.rpm-nav {
+    display: flex;
+    gap: 0.2rem;
+    background: #134e4a;
+    padding: 0.5rem 0.9rem 0;
+    overflow-x: auto;
+}
+.rpm-tab {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #bfd6d2;
+    padding: 0.65rem 1rem 0.75rem;
+    border: none;
+    background: none;
+    border-radius: 0.6rem 0.6rem 0 0;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.rpm-tab_on {
+    background: #f5f7f4;
+    color: #134e4a;
+}
+.rpm-main {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}

@@ -1,0 +1,31 @@
+.rpm-progress {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
+}
+.rpm-bar {
+    flex: 1;
+    height: 5px;
+    border-radius: 3px;
+    background: #e2e7e0;
+}
+.rpm-bar_done {
+    background: #134e4a;
+}
+.rpm-sub {
+    font-size: 0.82rem;
+    color: #5c6864;
+    margin-bottom: 0.6rem;
+}
+.rpm-device {
+    font-size: 0.95rem;
+}
+.rpm-err {
+    margin-top: 0.75rem;
+    color: #b3261e;
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+.rpm-next {
+    margin-left: 0.5rem;
+}

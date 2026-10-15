@@ -1,0 +1,106 @@
+:host {
+    display: block;
+}
+.rpm-chart {
+    overflow-x: auto;
+}
+.rpm-chart svg {
+    width: 100%;
+    min-width: 520px;
+    height: auto;
+    display: block;
+}
+.rpm-grid {
+    stroke: #eef1ec;
+}
+.rpm-axis {
+    font-size: 9px;
+    fill: #8a948f;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+.rpm-target {
+    fill: #e4eeec;
+    opacity: 0.6;
+}
+.rpm-target__label {
+    font-size: 9px;
+    fill: #134e4a;
+}
+.rpm-line_crit {
+    stroke: #b3261e;
+    stroke-dasharray: 3 3;
+    fill: #b3261e;
+    font-size: 9px;
+}
+.rpm-line_hot {
+    stroke: #c2410c;
+    stroke-dasharray: 5 4;
+    fill: #c2410c;
+    font-size: 9px;
+}
+.rpm-line_low {
+    stroke: #64748b;
+    stroke-dasharray: 2 4;
+    fill: #64748b;
+    font-size: 9px;
+}
+.rpm-trend {
+    fill: none;
+    stroke: #2c6e68;
+    stroke-width: 1.5;
+    opacity: 0.6;
+}
+.rpm-dot {
+    fill: #134e4a;
+    stroke: #fff;
+    stroke-width: 1.5;
+}
+.rpm-dot_hot {
+    fill: #c2410c;
+}
+.rpm-dot_crit {
+    fill: #b3261e;
+}
+.rpm-dot_dia {
+    fill: #aeb8b3;
+}
+.rpm-value {
+    font-size: 9px;
+    font-weight: 600;
+    fill: #b3261e;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+.rpm-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    font-size: 0.72rem;
+    color: #5c6864;
+    padding-top: 0.5rem;
+}
+.rpm-key {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+    vertical-align: -1px;
+}
+.rpm-key_sys {
+    background: #134e4a;
+}
+.rpm-key_dia {
+    background: #aeb8b3;
+}
+.rpm-key_hot {
+    background: #c2410c;
+}
+.rpm-key_crit {
+    background: #b3261e;
+}
+.rpm-empty {
+    padding: 1.25rem;
+    text-align: center;
+    color: #8a948f;
+    font-size: 0.85rem;
+}

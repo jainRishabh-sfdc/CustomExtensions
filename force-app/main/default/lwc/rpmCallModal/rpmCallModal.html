@@ -1,0 +1,39 @@
+<template>
+    <lightning-modal-header label={heading}></lightning-modal-header>
+    <lightning-modal-body>
+        <p class="rpm-sub">{patientName} · {summary}</p>
+        <p class="rpm-sub">{instruction}</p>
+        <lightning-combobox
+            label="1 · Did you reach the patient?"
+            options={outcomeOptions}
+            value={outcome}
+            onchange={handleOutcome}
+            required
+        ></lightning-combobox>
+        <lightning-combobox
+            label="2 · Any symptoms? (chest pain, trouble breathing, weakness, confusion)"
+            options={symptomOptions}
+            value={symptoms}
+            onchange={handleSymptoms}
+            required={critical}
+        ></lightning-combobox>
+        <lightning-combobox
+            label="3 · Was the provider notified?"
+            options={providerOptions}
+            value={provider}
+            onchange={handleProvider}
+            required={critical}
+        ></lightning-combobox>
+        <lightning-input label="Recheck reading or note (optional)" max-length="200" value={note} onchange={handleNote}></lightning-input>
+        <template lwc:if={showEr}>
+            <div class="rpm-warn">Symptoms present: advise 911 / ER now and notify the provider the same hour.</div>
+        </template>
+        <template lwc:if={error}>
+            <div class="rpm-err">{error}</div>
+        </template>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label="Cancel" onclick={cancel}></lightning-button>
+        <lightning-button class="rpm-save" variant={saveVariant} label="Save call record" onclick={save}></lightning-button>
+    </lightning-modal-footer>
+</template>

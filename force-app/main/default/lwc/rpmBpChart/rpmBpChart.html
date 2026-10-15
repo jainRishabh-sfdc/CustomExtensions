@@ -1,0 +1,49 @@
+<template>
+    <template lwc:if={hasData}>
+        <div class="rpm-chart">
+            <svg viewBox={viewBox} role="img" aria-label="Blood pressure trend">
+                <template for:each={grid} for:item="g">
+                    <g key={g.key}>
+                        <line x1={g.x1} y1={g.y} x2={g.x2} y2={g.y} class="rpm-grid"></line>
+                        <text x={g.labelX} y={g.labelY} text-anchor="end" class="rpm-axis">{g.label}</text>
+                    </g>
+                </template>
+                <template lwc:if={target}>
+                    <rect x={target.x} y={target.y} width={target.width} height={target.height} class="rpm-target"></rect>
+                    <text x={target.labelX} y={target.labelY} text-anchor="end" class="rpm-target__label">{target.label}</text>
+                </template>
+                <template for:each={thresholds} for:item="l">
+                    <g key={l.key}>
+                        <line x1={l.x1} y1={l.y} x2={l.x2} y2={l.y} class={l.cls}></line>
+                        <text x={l.labelX} y={l.labelY} class={l.cls}>{l.label}</text>
+                    </g>
+                </template>
+                <polyline points={sysPath} class="rpm-trend"></polyline>
+                <template for:each={points} for:item="p">
+                    <g key={p.key}>
+                        <title>{p.title}</title>
+                        <template lwc:if={p.hasDia}>
+                            <circle cx={p.x} cy={p.diaY} r="3.5" class="rpm-dot_dia"></circle>
+                        </template>
+                        <circle cx={p.x} cy={p.sysY} r="5" class={p.sysCls}></circle>
+                        <template lwc:if={p.showValue}>
+                            <text x={p.x} y={p.valueY} text-anchor="middle" class="rpm-value">{p.value}</text>
+                        </template>
+                        <template lwc:if={p.showLabel}>
+                            <text x={p.x} y={p.labelY} text-anchor="end" transform={p.labelTransform} class="rpm-axis">{p.label}</text>
+                        </template>
+                    </g>
+                </template>
+            </svg>
+        </div>
+        <div class="rpm-legend">
+            <span><i class="rpm-key rpm-key_sys"></i>top number (systolic)</span>
+            <span><i class="rpm-key rpm-key_dia"></i>bottom number (diastolic, charted only)</span>
+            <span><i class="rpm-key rpm-key_hot"></i>outside the call or low line</span>
+            <span><i class="rpm-key rpm-key_crit"></i>above the emergency line</span>
+        </div>
+    </template>
+    <template lwc:else>
+        <div class="rpm-empty">No readings in this range.</div>
+    </template>
+</template>

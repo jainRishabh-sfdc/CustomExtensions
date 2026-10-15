@@ -1,0 +1,63 @@
+<template>
+    <p class="rpm-intro">
+        This month's RPM billing for every enrolled patient. Codes are worked out from reading days and logged care minutes.
+        Patients with billing locked (for example paid through a CMS model) never produce RPM codes.
+    </p>
+    <template lwc:if={error}>
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">{error}</div>
+    </template>
+    <template lwc:if={loading}>
+        <lightning-spinner alternative-text="Recalculating billing" size="small"></lightning-spinner>
+    </template>
+
+    <div class="rpm-kpis">
+        <div class="rpm-kpi rpm-kpi_ok"><div class="rpm-kpi__v">{withCodes}</div><div class="rpm-kpi__l">Patients with eligible codes so far</div></div>
+        <div class="rpm-kpi rpm-kpi_warn"><div class="rpm-kpi__v">{accruing}</div><div class="rpm-kpi__l">Still accruing</div></div>
+        <div class="rpm-kpi rpm-kpi_crit"><div class="rpm-kpi__v">{blocked}</div><div class="rpm-kpi__l">Blocked (locked or no consent)</div></div>
+    </div>
+
+    <div class="rpm-panel">
+        <div class="rpm-panel__head">Billing — {periodLabel}</div>
+        <div class="rpm-panel__sub">
+            Rules {rulesVersion}. 2–15 reading days = 99445, 16+ = 99454. 10–19 interactive minutes = 99470, 20+ = 99457, each extra 20 = 99458.
+            Verify against the current fee schedule and each payer before submitting claims.
+        </div>
+        <div class="rpm-panel__body rpm-scroll">
+            <table class="rpm-table">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Reading days (16)</th>
+                        <th>Care minutes (20)</th>
+                        <th>Interactive</th>
+                        <th>Eligible codes</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={rows} for:item="r">
+                        <tr key={r.patientId}>
+                            <td><button class="rpm-link" data-id={r.patientId} onclick={openPatient}>{r.patientName}</button></td>
+                            <td>
+                                <div class="rpm-mono">{r.readingDays} / 16</div>
+                                <div class="rpm-bar"><span class="rpm-bar__fill" style={r.daysStyle}></span></div>
+                            </td>
+                            <td>
+                                <div class="rpm-mono">{r.minutes} / 20</div>
+                                <div class="rpm-bar"><span class="rpm-bar__fill" style={r.minutesStyle}></span></div>
+                            </td>
+                            <td>{r.interactiveText}</td>
+                            <td>
+                                <template lwc:if={r.codes}><span class="rpm-chip rpm-chip_pine">{r.codes}</span></template>
+                                <template lwc:elseif={r.blockedReason}><span class="rpm-muted">{r.blockedReason}</span></template>
+                                <template lwc:else><span class="rpm-muted">none yet</span></template>
+                            </td>
+                            <td><span class={r.statusClass}>{r.status}</span></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <template lwc:if={noRows}><div class="rpm-empty">No enrolled patients yet.</div></template>
+        </div>
+    </div>
+</template>

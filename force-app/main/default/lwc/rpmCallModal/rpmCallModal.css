@@ -1,0 +1,23 @@
+.rpm-sub {
+    font-size: 0.82rem;
+    color: #5c6864;
+    margin-bottom: 0.5rem;
+}
+.rpm-warn {
+    margin-top: 0.75rem;
+    background: #fbe7e5;
+    color: #b3261e;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+.rpm-err {
+    margin-top: 0.75rem;
+    color: #b3261e;
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+.rpm-save {
+    margin-left: 0.5rem;
+}

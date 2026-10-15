@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#134E4A</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <description>Remote patient monitoring: alerts, devices and billing.</description>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <label>RPM Command</label>
+    <navType>Standard</navType>
+    <tabs>RPM_Command</tabs>
+    <tabs>RPM_Patient__c</tabs>
+    <tabs>RPM_Device__c</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

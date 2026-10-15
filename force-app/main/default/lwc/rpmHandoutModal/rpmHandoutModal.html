@@ -1,0 +1,49 @@
+<template>
+    <lightning-modal-header label="Hand out a device — safety checklist"></lightning-modal-header>
+    <lightning-modal-body>
+        <div class="rpm-progress">
+            <template for:each={bars} for:item="b">
+                <i key={b.key} class={b.cls}></i>
+            </template>
+        </div>
+
+        <template lwc:if={isStep1}>
+            <p class="rpm-sub">Step 1 of 4 — confirm you are holding the right device.</p>
+            <p class="rpm-device">
+                Device <strong>{deviceLabel}</strong> · {model}<br />
+                <span class="rpm-sub">IMEI {imei}</span>
+            </p>
+        </template>
+
+        <template lwc:if={isStep2}>
+            <p class="rpm-sub">Step 2 of 4 — who is this device for? Confirm identity with two identifiers (name and date of birth).</p>
+            <lightning-combobox label="Patient" options={patientOptions} value={patientId} onchange={handlePatient} required></lightning-combobox>
+            <lightning-input type="checkbox" label="I checked name and date of birth" checked={identity} onchange={handleIdentity}></lightning-input>
+        </template>
+
+        <template lwc:if={isStep3}>
+            <p class="rpm-sub">Step 3 of 4 — training and test reading.</p>
+            <lightning-input type="checkbox" label="Showed the patient how to take a seated reading, and they showed me back (teach-back)" checked={training} onchange={handleTraining}></lightning-input>
+            <lightning-input type="checkbox" label="A test reading reached the console under the right name" checked={testReading} onchange={handleTest}></lightning-input>
+            <lightning-input type="checkbox" label="Patient acknowledged this is a practice-owned loaner" checked={loaner} onchange={handleLoaner}></lightning-input>
+        </template>
+
+        <template lwc:if={isStep4}>
+            <p class="rpm-sub">Step 4 of 4 — go live.</p>
+            <p>{deviceLabel} will be linked to <strong>{patientName}</strong>. From the next reading on, everything lands in their chart.</p>
+        </template>
+
+        <template lwc:if={error}>
+            <div class="rpm-err">{error}</div>
+        </template>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label="Cancel" onclick={cancel}></lightning-button>
+        <template lwc:if={isStep4}>
+            <lightning-button class="rpm-next" variant="brand" label="Hand out and go live" onclick={finish}></lightning-button>
+        </template>
+        <template lwc:else>
+            <lightning-button class="rpm-next" variant="brand" label={nextLabel} onclick={next}></lightning-button>
+        </template>
+    </lightning-modal-footer>
+</template>
