@@ -12,3 +12,6 @@ package.xml
 **/__tests__/**
 
 node_modules/
+
+# Placeholder files that keep empty folders in Git
+**/.gitkeep
